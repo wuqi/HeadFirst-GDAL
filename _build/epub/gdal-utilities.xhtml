@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <meta charset="utf-8" />
+    <title>GDAL工具集</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> 
+  </head>
+  <body>
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="gdal">
+<span id="gdalutilities"></span><h1>GDAL工具集</h1>
+<p>主要来自 <a class="reference external" href="http://blog.csdn.net/liminlu0314/article/details/6978589">GDAL源码剖析（四）之命令行程序说明一</a><span class="link-target"> [http://blog.csdn.net/liminlu0314/article/details/6978589]</span> 和 <a class="reference external" href="http://blog.csdn.net/liminlu0314/article/details/7218543">GDAL源码剖析（四）之命令行程序说明二</a><span class="link-target"> [http://blog.csdn.net/liminlu0314/article/details/7218543]</span> 。对部分翻译进行了少量修改和更新。</p>
+<div class="section" id="id3">
+<h2>通用选项</h2>
+<p>所有GDAL工具都可以使用以下选项:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>--version
+    返回GDAL版本.
+--license
+    返回license信息.
+--formats
+    返回所有支持的格式.
+--format [format]
+    某种格式的详细信息.
+--optfile filename
+    将一个文件中的内容作为工具参数列表.
+--config key value
+    设置系统参数.
+--debug [on/off/value]
+    设置debug级别.
+--pause
+    在出发调试器的时候，等待用户输入
+--locale [locale]
+    为调试设置本机环境(ie. en_US.UTF-8)
+--help-general
+    显示通用选项.
+</pre></div>
+</div>
+<p>实例:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalinfo --help-general
+</pre></div>
+</div>
+</div>
+<div class="section" id="gdalinfo">
+<span id="id4"></span><h2>gdalinfo文件信息工具</h2>
+<p><code class="docutils literal"><span class="pre">gdalinfo</span></code> 主要用来显示栅格数据的所有信息,用法如下:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalinfo [-mm] [-stats] [-hist] [-nogcp] [-nomd]
+         [-norat] [-noct] [-nofl] [-checksum] [-proj4]
+         [-mdd domain] [-sd subdataset] datasetname
+</pre></div>
+</div>
+<p>参数说明:</p>
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-mm">
+<code class="descname">-mm</code><code class="descclassname"></code></dt>
+<dd><p>强制计算栅格每个波段的最大最小值</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-stats">
+<code class="descname">-stats</code><code class="descclassname"></code></dt>
+<dd><p>显示栅格统计值,如果没有,则强制计算统计值(均值,最大最小值,标准差等)</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-approx-stats">
+<code class="descname">-approx_stats</code><code class="descclassname"></code></dt>
+<dd><p>显示栅格统计值,如果没有,则强制计算.但是是非精确计算,基于缩略图或者部分数据进行计算,如果不需要精确值或者希望快速返回,请使用此参数代替-stats</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-hist">
+<code class="descname">-hist</code><code class="descclassname"></code></dt>
+<dd><p>显示所有波段的直方图信息</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-nogcp">
+<code class="descname">-nogcp</code><code class="descclassname"></code></dt>
+<dd><p>禁止地面控制点显示,某些数据类型有上千的地面控制点,使用此选项可以禁止</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-nomd">
+<code class="descname">-nomd</code><code class="descclassname"></code></dt>
+<dd><p>禁止元数据显示.有些数据集可能包括很多元数据</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-nrat">
+<code class="descname">-nrat</code><code class="descclassname"></code></dt>
+<dd><p>禁止栅格属性表显示</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-noct">
+<code class="descname">-noct</code><code class="descclassname"></code></dt>
+<dd><p>禁止颜色表显示</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-checksum">
+<code class="descname">-checksum</code><code class="descclassname"></code></dt>
+<dd><p>强制计算所有波段的校验值</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-mdd">
+<code class="descname">-mdd</code><code class="descclassname"> domain</code></dt>
+<dd><p>报告指定域的元数据</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-nofl">
+<code class="descname">-nofl</code><code class="descclassname"></code></dt>
+<dd><p>只显示文件列表中第一个文件</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-sd">
+<code class="descname">-sd</code><code class="descclassname"> subdataset</code></dt>
+<dd><p>如果输入数据集包含几个子数据,读取并显示指定的号码（从1开始）的子数据集。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalinfo-proj4">
+<code class="descname">-proj4</code><code class="descclassname"> (GDAL &gt;= 1.9.0)</code></dt>
+<dd><p>将文件的坐标系用proj4格式的字符串显示</p>
+</dd></dl>
+
+<p>gdalinfo默认显示信息:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>文件类型
+文件大小(以像素表示).
+坐标信息(用OGC WKT串表示).
+与该文件关联的地理转换
+左上右下脚点坐标
+地面控制点
+元数据
+波段数据类型(byte int16...)
+Band color interpretations.
+波段自动分块大小Band block size.
+波段描述Band descriptions.
+波段最大最小值Band min/max values (internally known and possibly computed).
+波段校验值Band checksum (if computation asked).
+波段的NODATA值Band NODATA value.
+Band overview resolutions available.
+波段长度单位Band unit type (i.e.. &quot;meters&quot; or &quot;feet&quot; for elevation bands).
+波段伪彩色表Band pseudo-color tables.
+</pre></div>
+</div>
+<p>实例:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalinfo 1.tif
+</pre></div>
+</div>
+</div>
+<div class="section" id="gdalwarp">
+<span id="gdalwarptool"></span><h2>gdalwarp 图像纠正工具</h2>
+<p><code class="docutils literal"><span class="pre">gdalwarp</span></code> 工具是一个图像镶嵌、重投影、和纠正的工具，用法如下:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp [-s_srs srs_def] [-t_srs srs_def] [-to &quot;NAME=VALUE&quot;]
+    [-order n | -tps | -rpc | -geoloc] [-et err_threshold]
+    [-refine_gcps tolerance [minimum_gcps]]
+    [-te xmin ymin xmax ymax] [-tr xres yres] [-tap] [-ts width height]
+    [-wo &quot;NAME=VALUE&quot;] [-ot Byte/Int16/...] [-wt Byte/Int16]
+    [-srcnodata &quot;value [value...]&quot;] [-dstnodata &quot;value [value...]&quot;] -dstalpha
+    [-r resampling_method] [-wm memory_in_mb] [-multi] [-q]
+    [-cutline datasource] [-cl layer] [-cwhere expression]
+    [-csql statement] [-cblend dist_in_pixels] [-crop_to_cutline]
+    [-of format] [-co &quot;NAME=VALUE&quot;]* [-overwrite]
+    [-nomd] [-cvmd meta_conflict_value] [-setci]
+    srcfile* dstfile
+</pre></div>
+</div>
+<p>参数说明：</p>
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-s-srs">
+<code class="descname">-s_srs</code><code class="descclassname"> srs def</code></dt>
+<dd><p>设置原始空间参考，坐标系统是可以使用函数OGRSpatialReference.SetFromUserInput()调用的就行，包括EPSG PCS，PROJ4或者后缀名为.prf的wkt文本文件。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-t-srs">
+<code class="descname">-t_srs</code><code class="descclassname"> srs_def</code></dt>
+<dd><p>设置目标空间参考，坐标系统是可以使用函数OGRSpatialReference.SetFromUserInput()调用的就行，包括EPSG PCS，PROJ4或者后缀名为.prf的wkt文本文件。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-to">
+<code class="descname">-to</code><code class="descclassname"> NAME=VALUE</code></dt>
+<dd><p>设置转换参数选项，具体选项参考函数GDALCreateGenImgProjTransformer2()支持的选项。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-order">
+<code class="descname">-order</code><code class="descclassname"> n</code></dt>
+<dd><p>多项式纠正次数（1到3），默认的多项式次数根据输入的GCP点个数自动计算。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-tps">
+<code class="descname">-tps</code><code class="descclassname"></code></dt>
+<dd><p>强制使用TPS（thin plate spline）纠正方法来纠正图像。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-rpc">
+<code class="descname">-rpc:</code><code class="descclassname"></code></dt>
+<dd><p>强制使用RPC参数纠正。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-geoloc">
+<code class="descname">-geoloc</code><code class="descclassname"></code></dt>
+<dd><p>强制使用Geolocation数组。（这个没用过，不太清楚）</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-et">
+<code class="descname">-et</code><code class="descclassname"> err_threshold</code></dt>
+<dd><p>指定变换的近似误差阈值，默认为0.125个像元大小（使用像元为单位）。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-refine-gcps">
+<code class="descname">-refine_gcps</code><code class="descclassname"> tolerance minimum_gcps</code></dt>
+<dd><p>细化控制点，自动消除离群值。离群值将被淘汰，直到剩下的控制点为minimum_gcps时或检测不到异常值时。通过调整tolerance，去除离群的GCP。不只适用于多项式插值GCP细化。如果没有投影，tolerance以像素为单位，否则它是SRS单位。如果不设置minimum_gcps，根据多项式模型需要的最少控制点来确定（1次2个点，2次三个点，三次6个点）。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-te">
+<code class="descname">-te</code><code class="descclassname"> xmin ymin xmax ymax</code></dt>
+<dd><p>设置输出文件的地理范围（在目标空间参考中）。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-tr">
+<code class="descname">-tr</code><code class="descclassname"> xres yres</code></dt>
+<dd><p>设置输出图像的分辨率。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-tap">
+<code class="descname">-tap</code><code class="descclassname"></code></dt>
+<dd><p>(GDAL &gt;= 1.8.0) (target aligned pixels) align the coordinates of the extent of the output file to the values of the -tr, such that the aligned extent includes the minimum extent.</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-ts">
+<code class="descname">-ts</code><code class="descclassname"> width height</code></dt>
+<dd><p>设置输出文件的宽高。如果宽或者高有一个为0，那么将自动计算一个值，注意-ts和-tr不能同时使用。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-wo">
+<code class="descname">-wo</code><code class="descclassname"> &quot;NAME=VALUE&quot;</code></dt>
+<dd><p>设置纠正选项。具体参考GDALWarpOptions::papszWarpOptions的帮助文档。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-ot">
+<code class="descname">-ot</code><code class="descclassname"> type</code></dt>
+<dd><p>指定输出波段的数据类型。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-wt">
+<code class="descname">-wt</code><code class="descclassname"> type</code></dt>
+<dd><p>计算的数据类型。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-r">
+<code class="descname">-r</code><code class="descclassname"> resampling_method</code></dt>
+<dd><p>重采样方式，主要有下面几种方式：</p>
+<ul class="simple">
+<li><p>near: 最邻近采样方法（默认值，算法较快，但是质量较差）。</p></li>
+<li><p>bilinear: 双线性内插采样。</p></li>
+<li><p>cubic: 立方卷积采样。</p></li>
+<li><p>cubicspline: 立方样条采样。</p></li>
+<li><p>lanczos: Lanczos 窗口辛克采样。</p></li>
+<li><p>average: average resampling, computes the average of all non-NODATA contributing pixels. (GDAL &gt;= 1.10.0)</p></li>
+<li><p>mode: mode resampling, selects the value which appears most often of all the sampled points. (GDAL &gt;= 1.10.0)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-srcnodata">
+<code class="descname">-srcnodata</code><code class="descclassname"> value [value...]</code></dt>
+<dd><p>设置输入波段的Nodata值，可以为不同的波段指定不同的值。。如果有多个值，就需要把他们用双引号括起来，以保持在命令参数中作为单一参数输入。掩膜值不会在内插中处理。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-dstnodata">
+<code class="descname">-dstnodata</code><code class="descclassname"> value [value...]</code></dt>
+<dd><p>设置输出波段的Nodata值。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-dstalpha">
+<code class="descname">-dstalpha</code><code class="descclassname"></code></dt>
+<dd><p>创建一个Alpha波段在输出文件中。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-wm">
+<code class="descname">-wm</code><code class="descclassname"> memory_in_mb</code></dt>
+<dd><p>设置纠正API使用的内存大小，以MB为单位。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-multi">
+<code class="descname">-multi</code><code class="descclassname"></code></dt>
+<dd><p>是否使用多线程纠正图像，多线程用来分块处理，同时在读取和写入图像均使用多线程技术。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-q">
+<code class="descname">-q</code><code class="descclassname"></code></dt>
+<dd><p>不在控制台输出提示信息。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-of">
+<code class="descname">-of</code><code class="descclassname"> format</code></dt>
+<dd><p>输出文件格式，默认为GeoTiff。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-co">
+<code class="descname">-co</code><code class="descclassname"> &quot;NAME=VALUE&quot;</code></dt>
+<dd><p>指定创建图像选项，具体参考不同的格式说明。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-cutline">
+<code class="descname">-cutline</code><code class="descclassname"> datasource</code></dt>
+<dd><p>使用使用OGR支持的矢量数据进行裁切图像。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-cl">
+<code class="descname">-cl</code><code class="descclassname"> layername</code></dt>
+<dd><p>指定裁切矢量的图层名称。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-cwhere">
+<code class="descname">-cwhere</code><code class="descclassname"> expression</code></dt>
+<dd><p>从裁切矢量中根据属性表查询指定的要素来裁切图像。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-csql">
+<code class="descname">-csql</code><code class="descclassname"> query</code></dt>
+<dd><p>使用SQL语句来从裁切矢量的属性表中查询要素来裁切图像。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-cblend">
+<code class="descname">-cblend</code><code class="descclassname"> distance</code></dt>
+<dd><p>Set a blend distance to use to blend over cutlines (in pixels).（这个参数不太清楚，没用过）</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-crop-to-cutline">
+<code class="descname">-crop_to_cutline</code><code class="descclassname"></code></dt>
+<dd><p>(GDAL &gt;= 1.8.0) 使用矢量边界的外接矩形大小作为输出影像的范围。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-overwrite">
+<code class="descname">-overwrite</code><code class="descclassname"></code></dt>
+<dd><p>(GDAL &gt;= 1.8.0) 如果结果数据存在，那么覆盖结果数据。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-arg-srcfile">
+<code class="descname">srcfile</code><code class="descclassname"></code></dt>
+<dd><p>输入数据文件名（可以为多个，使用空格隔开）。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalwarp-arg-dstfile">
+<code class="descname">dstfile</code><code class="descclassname"></code></dt>
+<dd><p>输出数据文件名。
+如果输出文件已经存在，那么镶嵌到这个文件是可以的。但是数据的空间范围等信息不会被修改，如果要修改为新的数据的空间信息，那么需要使用-overwrite选项来覆盖原文件。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="gdal-translate">
+<span id="id5"></span><h2>gdal_translate格式转换工具</h2>
+<p><code class="docutils literal"><span class="pre">gdal_translate</span></code> 主要用来转换数据格式 ,用法如下:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_translate [--help-general]
+    [-ot {Byte/Int16/UInt16/UInt32/Int32/Float32/Float64/
+    CInt16/CInt32/CFloat32/CFloat64}] [-strict]
+    [-of format] [-b band] [-mask band] [-expand {gray|rgb|rgba}]
+    [-outsize xsize[%] ysize[%]]
+    [-unscale] [-scale [src_min src_max [dst_min dst_max]]]
+    [-srcwin xoff yoff xsize ysize] [-projwin ulx uly lrx lry] [-epo] [-eco]
+    [-a_srs srs_def] [-a_ullr ulx uly lrx lry] [-a_nodata value]
+    [-gcp pixel line easting northing [elevation]]*
+    [-mo &quot;META-TAG=VALUE&quot;]* [-q] [-sds]
+    [-co &quot;NAME=VALUE&quot;]* [-stats]
+    src_dataset dst_dataset
+</pre></div>
+</div>
+<p>参数说明:</p>
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-ot">
+<code class="descname">-ot:</code><code class="descclassname"> type</code></dt>
+<dd><p>输出文件波段数据类型{Byte/Int16/UInt16/UInt32/Int32/Float32/Float64/CInt16/CInt32/CFloat32/CFloat64}中的一个，默认与元数据集相同</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-strict">
+<code class="descname">-strict</code><code class="descclassname"></code></dt>
+<dd><p>严格模式，如果数据不匹配或者数据丢失，可能导致输出失败</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-of">
+<code class="descname">-of</code><code class="descclassname"> format</code></dt>
+<dd><p>选择输出格式,默认是GTiff格式</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-b">
+<code class="descname">-b</code><code class="descclassname"> band</code></dt>
+<dd><p>选择需要输出的波段,波段起始值为1,如果需要多个波段,或者调整波段顺序,请设置多个-b参数，例如 <code class="docutils literal"><span class="pre">-b</span> <span class="pre">3</span> <span class="pre">-b</span> <span class="pre">2</span> <span class="pre">-b</span> <span class="pre">1</span></code>.</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-mask">
+<code class="descname">-mask</code><code class="descclassname"> band</code></dt>
+<dd><p>选择波段作为掩膜波段</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-expand">
+<code class="descname">-expand</code><code class="descclassname"> gray|rgb|rgba</code></dt>
+<dd><p>将一个带颜色表的波段分解为3个（rgb）或4个波段（rgba）。主要用来输出JPEG, JPEG2000, MrSID, ECW一类不支持颜色索引的数据格式。gray表示将一个含有颜色表的数据集分解为一个灰度索引的数据集。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-outsize">
+<code class="descname">-outsize</code><code class="descclassname"> xsize[%] ysize[%]</code></dt>
+<dd><p>输出文件大小,单位为像素,带%则为相对源图像的比率</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-scale">
+<code class="descname">-scale</code><code class="descclassname"> [src_min src_max [dst_min dst_max]]</code></dt>
+<dd><p>输入像素值的比例范围,从dst_min dst_max到src_min src_max。如果省略了输出范围是0到255。如果省略了输入范围,将自动从源数据计算</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-unscale">
+<code class="descname">-unscale</code><code class="descclassname"></code></dt>
+<dd><p>将波段中使用元数据中的按比例缩放的值转换为实际值，经常与 <code class="docutils literal"><span class="pre">-ot</span></code> 选项一起使用来重置输出类型。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-srcwin">
+<code class="descname">-srcwin</code><code class="descclassname"> xoff yoff xsize ysize</code></dt>
+<dd><p>从原图中裁切一个子窗口，起点坐标为 <code class="docutils literal"><span class="pre">xoff,yoff</span></code> ,长为 <code class="docutils literal"><span class="pre">xsize</span></code> ,宽为 <code class="docutils literal"><span class="pre">ysize</span></code> 。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-projwin">
+<code class="descname">-projwin</code><code class="descclassname"> ulx uly lrx lry</code></dt>
+<dd><p>从原图中裁切一个子窗口，使用地理投影坐标， <code class="docutils literal"><span class="pre">ulx,uly</span></code> 为左上角坐标， <code class="docutils literal"><span class="pre">lrx,lry</span></code> 为右下角坐标</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-epo">
+<code class="descname">-epo</code><code class="descclassname"></code></dt>
+<dd><p><code class="docutils literal"><span class="pre">Error</span> <span class="pre">when</span> <span class="pre">Partially</span> <span class="pre">Outside</span></code> 。如果 <code class="docutils literal"><span class="pre">-srcwin</span></code> 或 <code class="docutils literal"><span class="pre">-projwin</span></code> 裁剪的子窗口部分超出原图，将提示错误</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-eco">
+<code class="descname">-eco</code><code class="descclassname"></code></dt>
+<dd><p><code class="docutils literal"><span class="pre">Error</span> <span class="pre">when</span> <span class="pre">Completely</span> <span class="pre">Outside</span></code> 。基本和 <code class="docutils literal"><span class="pre">-epo</span></code> 相同，除了如果子窗口完全超出原图，错误提示不同。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-a-srs">
+<code class="descname">-a_srs</code><code class="descclassname"> srs_def</code></dt>
+<dd><p>指定输出文件投影，投影字符串可以是wkt、proj4、EPSG号等格式</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-a-ullr">
+<code class="descname">-a_ullr</code><code class="descclassname"> ulx uly lrx lry</code></dt>
+<dd><p>指定输出文件的地理投影边界，使用地理投影坐标， <code class="docutils literal"><span class="pre">ulx,uly</span></code> 为左上角坐标， <code class="docutils literal"><span class="pre">lrx,lry</span></code> 为右下角坐标</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-a-nodata">
+<code class="descname">-a_nodata</code><code class="descclassname"> value</code></dt>
+<dd><p>指定nodata值。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-mo">
+<code class="descname">-mo</code><code class="descclassname"> “META-TAG=VALUE”</code></dt>
+<dd><p>设置元数据</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-co">
+<code class="descname">-co</code><code class="descclassname"> “NAME=VALUE”</code></dt>
+<dd><p>设置创建选项，，参考 <a class="reference internal" href="read-and-write.xhtml#createdataset"><span class="std std-ref">创建数据集</span></a> 一节代码示例，可以设置多个。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-gcp">
+<code class="descname">-gcp</code><code class="descclassname"> pixel line easting northing elevation</code></dt>
+<dd><p>设置GCP点，可以设置多个</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-q">
+<code class="descname">-q</code><code class="descclassname"></code></dt>
+<dd><p>静默输出，禁止显示进度条和非错误信息</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-sds">
+<code class="descname">-sds</code><code class="descclassname"></code></dt>
+<dd><p>将每个子数据集到单独的输出文件中。主要用于HDF等有子数据集的数据转换</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-stats">
+<code class="descname">-stats</code><code class="descclassname"></code></dt>
+<dd><p>强制重计算统计信息</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-arg-src-dataset">
+<code class="descname">src_dataset</code><code class="descclassname"></code></dt>
+<dd><p>源数据集名称</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdal-translate-arg-dst-dataset">
+<code class="descname">dst_dataset</code><code class="descclassname"></code></dt>
+<dd><p>输出数据集名称</p>
+</dd></dl>
+
+</div>
+<div class="section" id="gdalmanage">
+<h2>gdalmanage文件管理工具</h2>
+<p><code class="docutils literal"><span class="pre">gdalmanage</span></code> 主要用来管理栅格数据,用法如下:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalmanage mode [-r] [-u] [-f format]
+              datasetname [newdatasetname]
+</pre></div>
+</div>
+<p>参数说明:</p>
+<dl class="cmdoption">
+<dt id="cmdoption-gdalmanage-arg-mode">
+<code class="descname">mode</code><code class="descclassname"></code></dt>
+<dd><p>操作模式</p>
+<ul class="simple">
+<li><p>identify datasetname:     显示数据格式</p></li>
+<li><p>copy datasetname newdatasetname:     拷贝数据</p></li>
+<li><p>rename datasetname newdatasetname:  重命名数据</p></li>
+<li><p>delete datasetname:  删除数据</p></li>
+</ul>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalmanage-r">
+<code class="descname">-r</code><code class="descclassname"></code></dt>
+<dd><p>递归扫描文件/文件夹</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalmanage-u">
+<code class="descname">-u</code><code class="descclassname"></code></dt>
+<dd><p>如果文件无法执行操作，显示操作失败信息</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalmanage-f">
+<code class="descname">-f</code><code class="descclassname"> format</code></dt>
+<dd><p>指定数据格式，例如GTiff</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalmanage-arg-datasetname">
+<code class="descname">datasetname</code><code class="descclassname"></code></dt>
+<dd><p>需要操作的文件名</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalmanage-arg-newdatasetname">
+<code class="descname">newdatasetname</code><code class="descclassname"></code></dt>
+<dd><p>复制或重命名操作时，需要设置此参数。</p>
+</dd></dl>
+
+<p>实例:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalmanage identify -r 50m_raster/
+
+gdalmanage copy NE1_50M_SR_W.tif ne1_copy.tif
+
+gdalmanage rename NE1_50M_SR_W.tif ne1_rename.tif
+
+gdalmanage identify NE1_50M_SR_W.tif
+</pre></div>
+</div>
+</div>
+<div class="section" id="gdallocationinfo">
+<h2>gdallocationinfo像元查询工具</h2>
+<p><code class="docutils literal"><span class="pre">gdallocationinfo</span></code> 通过指定一种坐标系中的坐标来进行对其位置的像元值进行输出显示</p>
+<p>用法如下:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdallocationinfo [--help-general] [-xml] [-lifonly] [-valonly]
+                [-b band]* [-overview overview_level]
+                [-l_srs srs_def] [-geoloc] [-wgs84]
+                srcfile [x y]
+</pre></div>
+</div>
+<p>参数说明:</p>
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-help-general">
+<code class="descname">--help-general</code><code class="descclassname"></code></dt>
+<dd><p>显示帮助</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-xml">
+<code class="descname">-xml</code><code class="descclassname"></code></dt>
+<dd><p>输出xml信息</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-lifonly">
+<code class="descname">-lifonly</code><code class="descclassname"></code></dt>
+<dd><p>输出LocationInfo 中的信息。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-valonly">
+<code class="descname">-valonly</code><code class="descclassname"></code></dt>
+<dd><p>仅输出指定位置的每个波段的像元值</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-l-srs">
+<code class="descname">-l_srs</code><code class="descclassname"> srs def</code></dt>
+<dd><p>指定输入的x,y坐标的坐标系</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-geoloc">
+<code class="descname">-geoloc</code><code class="descclassname"></code></dt>
+<dd><p>表示输入的x,y坐标是地理参考坐标系</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-wgs84">
+<code class="descname">-wgs84</code><code class="descclassname"></code></dt>
+<dd><p>表示输入的x,y是WGS84坐标系下的经纬度坐标</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-arg-srcfile">
+<code class="descname">srcfile</code><code class="descclassname"></code></dt>
+<dd><p>输入栅格图像的名称</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-arg-x">
+<code class="descname">x</code><code class="descclassname"></code></dt>
+<dd><p>查询的X坐标。默认为图像列号，如果使用-l_srs,-wgs84或者-geoloc时按照指定的坐标来处理</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdallocationinfo-arg-y">
+<code class="descname">y</code><code class="descclassname"></code></dt>
+<dd><p>查询的Y坐标。默认为图像行号，如果使用-l_srs,-wgs84或者-geoloc时按照指定的坐标来处理</p>
+</dd></dl>
+
+<p>该工具的目的是输出一个像素的各种信息。目前支持下面四项：</p>
+<ul class="simple">
+<li><p>像素的行列号。</p></li>
+<li><p>输出元数据中的LocationInfo 信息，目前只支持VRT文件。</p></li>
+<li><p>全部波段或子文件中的所有波段中的像元值。</p></li>
+<li><p>未缩放的像元值，如果对波段进行了缩放和偏移操作。</p></li>
+</ul>
+<p>输入x和y坐标是，是通过命令行来进行输入的，一般是先x后y，即先列号后行号；如果使用-geoloc, -wgs84, 或-l_srs 选项后，会自动根据输入进行交换。默认的输出信息是纯文本文件，也可以使用-xml选项将其使用xml格式进行输出。将来会添加其他的信息。</p>
+<p>实例:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdallocationinfo utm.tif 256 256
+Report:
+  Location: (256P,256L)
+  Band 1:
+    Value: 115
+</pre></div>
+</div>
+</div>
+<div class="section" id="gdaltransform">
+<h2>gdaltransform坐标系转换工具</h2>
+<p><code class="docutils literal"><span class="pre">gdaltransform</span></code> 坐标系转换工具,用来转换坐标，从支持的投影，包括GCP点的变换。</p>
+<p>用法:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdaltransform [--help-general]
+              [-i] [-s_srs srs_def] [-t_srs srs_def] [-to &quot;NAME=VALUE&quot;]
+              [-order n] [-tps] [-rpc] [-geoloc]
+              [-gcp pixel line easting northing [elevation]]*
+              [srcfile [dstfile]]
+</pre></div>
+</div>
+<p>参数说明：</p>
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-s-srs">
+<code class="descname">-s_srs</code><code class="descclassname"> srs def</code></dt>
+<dd><p>原始空间参考，该值将被OGRSpatialReference.SetFromUserInput()函数调用，支持包括EPSG PCS 和GCSes (如EPSG:4296), PROJ.4声明或者一个后缀名为.prf的文件存储的WKT串。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-t-srs">
+<code class="descname">-t_srs</code><code class="descclassname"> srs_def</code></dt>
+<dd><p>目标空间参考，该值将被OGRSpatialReference.SetFromUserInput()函数调用，支持包括EPSG PCS 和GCSes (如EPSG:4296), PROJ.4声明或者一个后缀名为.prf的文件存储的WKT串。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-to">
+<code class="descname">-to</code><code class="descclassname"> NAME=VALUE</code></dt>
+<dd><p>设置转换参数，将会使函数GDALCreateGenImgProjTransformer2()来调用。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-order">
+<code class="descname">-order</code><code class="descclassname"> n</code></dt>
+<dd><p>几何多项式变换次数（1到3），默认情况下会根据输入的GCP点的个数自动确定。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-tps">
+<code class="descname">-tps</code><code class="descclassname"></code></dt>
+<dd><p>强制将GCP点使用TPS转换方式转换。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-rpc">
+<code class="descname">-rpc</code><code class="descclassname"></code></dt>
+<dd><p>强制使用RPC参数转换。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-geoloc">
+<code class="descname">-geoloc</code><code class="descclassname"></code></dt>
+<dd><p>强制使用Geolocation数组转换。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-i">
+<code class="descname">-i</code><code class="descclassname"></code></dt>
+<dd><p>逆转换，从目标到原始投影转换。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-gcppixel">
+<code class="descname">-gcppixel</code><code class="descclassname"> line easting northing [elevation]</code></dt>
+<dd><p>指定GCP点，通常至少需要三个。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-arg-srcfile">
+<code class="descname">srcfile</code><code class="descclassname"></code></dt>
+<dd><p>原始投影下定义的GCP点文件，如果没有指定，需要从命令行-s_srs或者-gcp参数输入。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdaltransform-arg-dstfile">
+<code class="descname">dstfile</code><code class="descclassname"></code></dt>
+<dd><p>目标投影定义文件。</p>
+</dd></dl>
+
+<p>读取的坐标必须是成对出现（或者三个一组），输出也以同样的方式输出，所有的变换共gdalwarp相同，包括使用GCP的变换。注意输入输出必须使用十进制小数，当前不支持DMS（度分秒）的输入输出。如果指定了输入图像，那么输入的坐标是基于图像的行列号，如果输出图像指定，输出的坐标也是图像的行列号。</p>
+<p>实例:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>下面的命令行使用基于RPC变换，并且使用-i选项来将经纬度坐标转为图像的行列号：
+gdaltransform -i -rpc 06OCT20025052-P2AS-005553965230_01_P001.TIF
+125.67206 39.85307 50
+输出：
+3499.49282422381 2910.83892848414 50
+</pre></div>
+</div>
+</div>
+<div class="section" id="gdalsrsinfosrs">
+<h2>gdalsrsinfo格式化SRS工具</h2>
+<p><code class="docutils literal"><span class="pre">gdalsrsinfo</span></code> 将给定的SRS按照不同的格式显示,用法如下:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalsrsinfo [--help-general/-h] [-p] [-V] [-o] srs_def
+</pre></div>
+</div>
+<p>参数说明:</p>
+<dl class="cmdoption">
+<dt id="cmdoption-gdalsrsinfo-help-general-h">
+<code class="descname">--help-general/-h</code><code class="descclassname"></code></dt>
+<dd><p>显示帮助</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalsrsinfo-p">
+<code class="descname">-p</code><code class="descclassname"></code></dt>
+<dd><p>格式化输出信息 (e.g. WKT)</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalsrsinfo-v">
+<code class="descname">-V</code><code class="descclassname"></code></dt>
+<dd><p>验证 SRS</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalsrsinfo-o">
+<code class="descname">-o</code><code class="descclassname"> out_type</code></dt>
+<dd><p>输出类型 { default, all, wkt_all, proj4, wkt, wkt_simple, wkt_noct, wkt_esri, mapinfo, xml }</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-gdalsrsinfo-arg-srs-def">
+<code class="descname">srs_def</code><code class="descclassname"></code></dt>
+<dd><p>可以是一个GDAL或者OGR支持的文件，或者是任何GDAL和OGR支持的SRS格式（包括WKT,PROJ4,EPSG:n等）</p>
+</dd></dl>
+
+<p>实例:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalsrsinfo   &quot;EPSG:4326&quot;
+
+PROJ.4 : &#39;+proj=longlat +datum=WGS84 +no_defs &#39;
+
+OGC WKT :
+GEOGCS[&quot;WGS 84&quot;,
+    DATUM[&quot;WGS_1984&quot;,
+        SPHEROID[&quot;WGS 84&quot;,6378137,298.257223563,
+            AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]],
+        AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]],
+    PRIMEM[&quot;Greenwich&quot;,0,
+        AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]],
+    UNIT[&quot;degree&quot;,0.0174532925199433,
+        AUTHORITY[&quot;EPSG&quot;,&quot;9122&quot;]],
+    AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

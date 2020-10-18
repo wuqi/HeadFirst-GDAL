@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <meta charset="utf-8" />
+    <title>前言</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> 
+  </head>
+  <body>
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>前言</h1>
+<p>O’Reilly有一个HeadFirst系列，面对完全的初学者的书籍。因为经常用到GDAL，也碰到过一些问题，所以从头开始，写一些经验，给大家分享。网上也有许多GDAL的文章，除了李民录老师写的，大部分不太系统，虽然有系统文档，但都是英文的，很多人都不想看，因此写这个文档，算是总结，也帮新手少走点弯路。本系列主要涉及的是GDAL的各个接口和调用，以及一些基础概念的阐述，不涉及其他应用方面，GDAL更新也比较快，所以本文也只能介绍主要的读写接口以及GDALWarp部分，不涉及更深入的内容。如果想学好，推荐还是认真阅读英文文档。</p>
+<p>本文主要注重于栅格影像处理，矢量ogr库暂时没有涉及（以后可能会添加），主要使用 c++ 语言，vs2010 或 vc6 平台下使用。</p>
+<div class="section" id="gdal">
+<h2>GDAL是什么</h2>
+<p>GDAL 是 <code class="docutils literal"><span class="pre">Geospatial</span> <span class="pre">Data</span> <span class="pre">Abstraction</span> <span class="pre">Library</span></code> 的缩写，是一个在X/MIT许可协议下的开源栅格空间数据转换库。它利用抽象数据模型来表达所支持的各种文件格式。它还有一系列命令行工具来进行数据转换和处理。OGR是GDAL项目的一个分支，功能与GDAL类似，只不过它提供对矢量数据的支持。</p>
+<p>有很多著名的GIS类产品都使用了GDAL/OGR库，包括ESRI的ArgGIS平台，Google Earth和跨平台的GRASS GIS系统。</p>
+</div>
+<div class="section" id="id2">
+<h2>GDAL能做什么</h2>
+<p>GDAL可以用来对各种栅格数据格式进行读写，也可以用于格式相互转换，图像几何校正、重投影、重采样等。</p>
+<p>GDAL中包括很多算法，比如surf匹配算法，TPS纠正等几何纠正算法，OGR库中也可以进行拓扑运算，因为是开源的，所以部分算法可以参照源码，如TPS中矩阵运算可以添加Aramdillo库，匹配算法也可以借鉴学习。</p>
+</div>
+<div class="section" id="id3">
+<h2>参考文档</h2>
+<p>文档参考的文章和示例来自以下位置：</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.gdal.org">GDAL源文档</a><span class="link-target"> [http://www.gdal.org]</span></p></li>
+<li><p><a class="reference external" href="http://blog.csdn.net/liminlu0314?viewmode=contents">李民录GDAL专栏</a><span class="link-target"> [http://blog.csdn.net/liminlu0314?viewmode=contents]</span></p></li>
+<li><p><a class="reference external" href="http://www.geoapi.org/3.0/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT</a><span class="link-target"> [http://www.geoapi.org/3.0/javadoc/org/opengis/referencing/doc-files/WKT.html]</span></p></li>
+<li><p><a class="reference external" href="http://blog.sina.com.cn/s/blog_7f6303470101fzcw.html">地图投影系列介绍</a><span class="link-target"> [http://blog.sina.com.cn/s/blog_7f6303470101fzcw.html]</span></p></li>
+<li><p><a class="reference external" href="http://www.cnblogs.com/yiyezhai/p/3182955.html">地图投影简明笔记</a><span class="link-target"> [http://www.cnblogs.com/yiyezhai/p/3182955.html]</span></p></li>
+</ul>
+</div>
+<div class="section" id="id8">
+<h2>如何使用GDAL库</h2>
+<p>很多新手不知道下载的编译完成的库如何使用，下面以vc6和vs2010中如何使用为例，给大家讲解下。本部分参照 <a class="reference external" href="http://blog.csdn.net/liminlu0314/article/details/7072007">GDAL源码剖析（六）之GDAL开发及其调试</a><span class="link-target"> [http://blog.csdn.net/liminlu0314/article/details/7072007]</span> ,其中讲的已经比较清楚,本段简单介绍下载或编译完成的库如何使用。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>如果不关心如何编译调试GDAL的话，可以直接使用 <a class="reference external" href="http://pan.baidu.com/s/1oqGwu">框架</a><span class="link-target"> [http://pan.baidu.com/s/1oqGwu]</span> ,里面有已经设置好的环境和基础的两影像相加的示例.</p></li>
+<li><p>没有C++基础的新手，推荐阅读下 <a class="reference external" href="http://www.cnblogs.com/skynet/p/3372855.html">C++静态库与动态库</a><span class="link-target"> [http://www.cnblogs.com/skynet/p/3372855.html]</span> ，对库的解说比较好.</p></li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h3>目录说明</h3>
+<p>下载完成的GDAL库，一般有 <code class="docutils literal"><span class="pre">lib</span> <span class="pre">include</span> <span class="pre">html</span> <span class="pre">data</span> <span class="pre">bin</span></code> 几个文件夹，这些是必须文件，其他有些是调试或绑定其他语言用的文件夹 ,下面分别介绍其作用:</p>
+<ul class="simple">
+<li><p>lib       里面包含 gdal_i.lib 库文件</p></li>
+<li><p>include   包含头文件</p></li>
+<li><p>html      包含html文档说明</p></li>
+<li><p>data      包含GDAL的数据文件，例如epsg文件、dxf头文件、S-57 定义文件等，可以设置 <code class="docutils literal"><span class="pre">GDAL_DATA</span></code> 环境变量来改变其路径</p></li>
+<li><p>bin       工具集，包括一个dll文件。</p></li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h3>安装</h3>
+<p>新建工程，在新建工程中添加 <code class="docutils literal"><span class="pre">GDAL</span></code> 目录，将上述文件夹中的 <code class="docutils literal"><span class="pre">lib</span> <span class="pre">include</span></code> 文件夹拷贝到新建的 <code class="docutils literal"><span class="pre">GDAL</span></code> 目录中，至此完成安装。</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<ul class="simple">
+<li><p>也可以在工程设置中设置所在路径，本步骤并非必须步骤，仅为了方便下面介绍以及新手理解</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id12">
+<h3>工程设置</h3>
+<div class="section" id="vc6">
+<h4>vc6</h4>
+<p>打开或新建vc6工程，在菜单中找到工程-&gt;设置(Project-&gt;Settings)，如下所示：</p>
+<img alt="vc6 project setting" class="align-center" src="_images/vc6setting.png" />
+<p>设置Include路径，点击 <code class="docutils literal"><span class="pre">c++</span></code> Tab页,在 <code class="docutils literal"><span class="pre">Category</span></code> 中选择 <code class="docutils literal"><span class="pre">Preprocessor</span></code>,第三项,添加Include目录中,添加gdal的include文件夹路径:</p>
+<img alt="vc6 include setting" class="align-center" src="_images/vc6Include.png" />
+<p>设置Lib路径,点击 <code class="docutils literal"><span class="pre">Link</span></code> Tab页,在 <code class="docutils literal"><span class="pre">Category</span></code> 中,选择 <code class="docutils literal"><span class="pre">Input</span></code> ,第一项中填入 <code class="docutils literal"><span class="pre">gdal_i.lib</span></code> ,第四项中添加gdal中的lib文件夹路径：</p>
+<img alt="vc6 link setting" class="align-center" src="_images/vc6Link.png" />
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<ul class="simple">
+<li><p>编译完成后，需要将 <code class="docutils literal"><span class="pre">bin</span></code> 或者 <code class="docutils literal"><span class="pre">lib</span></code> 文件夹下面的DLL文件全部拷贝到输出目录中（Debug或Release文件夹中）</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="vs2010">
+<h4>vs2010</h4>
+<p>打开或新建vs工程，右键设置项目属性，如下所示：</p>
+<img alt="vc6 project setting" class="align-center" src="_images/vs2010setting.png" />
+<p>设置Include路径，点击 <code class="docutils literal"><span class="pre">C++</span></code> 填写第一项，在附加包含目录中添加gdal的Include文件夹路径：</p>
+<img alt="vc6 include setting" class="align-center" src="_images/vs2010Include.png" />
+<p>设置Lib路径,点击 <code class="docutils literal"><span class="pre">链接器</span></code> ,在 <code class="docutils literal"><span class="pre">常规</span></code> 中, <code class="docutils literal"><span class="pre">附加库目录</span></code> 里添加gdal中的lib文件夹路径：</p>
+<img alt="vc6 link setting" class="align-center" src="_images/vs2010Link1.png" />
+<p>设置Lib库，点击 <code class="docutils literal"><span class="pre">链接器</span></code> ,在 <code class="docutils literal"><span class="pre">输入</span></code> 中, <code class="docutils literal"><span class="pre">附加依赖项</span></code> 里添加填入 <code class="docutils literal"><span class="pre">gdal_i.lib</span></code>：</p>
+<img alt="vc6 link setting" class="align-center" src="_images/vs2010Link2.png" />
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<ul class="simple">
+<li><p>编译完成后，需要将 <code class="docutils literal"><span class="pre">bin</span></code> 或者 <code class="docutils literal"><span class="pre">lib</span></code> 文件夹下面的DLL文件全部拷贝到输出目录中（Debug或Release文件夹中）</p></li>
+</ul>
+</div>
+<p>这样就完成了环境设置，接下来就可以按照  <a class="reference internal" href="read-and-write.xhtml#read-write"><span class="std std-ref">栅格数据读写</span></a>  的例子读写数据了。</p>
+</div>
+</div>
+</div>
+<div class="section" id="ogr">
+<h2>OGR库说明</h2>
+<p>现在仅初步使用 <code class="docutils literal"><span class="pre">OGR</span></code> 库，大部分只是翻译文档,没有深入使用，有些翻译并不准确。如有不确定的地方，请参照文档。在 <code class="docutils literal"><span class="pre">GDAL2.0</span></code> 中， <code class="docutils literal"><span class="pre">OGR</span></code> 库和 <code class="docutils literal"><span class="pre">GDAL</span></code> 库的数据集已经合并，其他部分基本没变，且 <code class="docutils literal"><span class="pre">v2.0</span></code> 版本尚未发布，现有翻译参照 <code class="docutils literal"><span class="pre">v.1.11</span></code> 来写。</p>
+</div>
+<div class="section" id="id13">
+<h2>使用的工具</h2>
+<p>文档使用 <code class="docutils literal"><span class="pre">sphinx</span></code> 编写，演示图片使用 <a class="reference external" href="http://pencil.evolus.vn">Pencil</a><span class="link-target"> [http://pencil.evolus.vn]</span> 绘制。pdf使用TexLive2013生成。</p>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

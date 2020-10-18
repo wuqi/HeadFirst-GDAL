@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <meta charset="utf-8" />
+    <title>HeadFirst GDAL</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> 
+  </head>
+  <body>
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="headfirst-gdal">
+<h1>HeadFirst GDAL</h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.xhtml">前言</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="preface.xhtml#gdal">GDAL是什么</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.xhtml#id2">GDAL能做什么</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.xhtml#id3">参考文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.xhtml#id8">如何使用GDAL库</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="preface.xhtml#id10">目录说明</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preface.xhtml#id11">安装</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preface.xhtml#id12">工程设置</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="preface.xhtml#ogr">OGR库说明</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.xhtml#id13">使用的工具</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="formats.xhtml">影像是什么</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="formats.xhtml#id3">影像元数据</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formats.xhtml#gdal">GDAL中的影像</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="formats.xhtml#multibands">多波段数据</a></li>
+<li class="toctree-l3"><a class="reference internal" href="formats.xhtml#multidatasets">多数据集数据</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-data-model.xhtml">GDAL数据模型</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gdal-data-model.xhtml#dataset">数据集</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gdal-data-model.xhtml#coordinatesystem">投影系统</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdal-data-model.xhtml#affinegeotransform">仿射地理变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdal-data-model.xhtml#gcp">GCP点</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdal-data-model.xhtml#metadata">元数据</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-data-model.xhtml#rasterband">波段</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-data-model.xhtml#colortable">颜色表</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-data-model.xhtml#overviews">金字塔层</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="read-and-write.xhtml">栅格数据读写</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="read-and-write.xhtml#gdaldriver">GdalDriver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read-and-write.xhtml#gdalread">数据读取</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id4">打开数据集</a></li>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id5">打开波段</a></li>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id6">读取内容</a></li>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id7">关闭数据集</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="read-and-write.xhtml#write">数据写入</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id9">获取驱动</a></li>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#createdataset">创建数据集</a></li>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id15">写入数据</a></li>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id16">关闭数据集</a></li>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id17">分块读写</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="read-and-write.xhtml#gdal2-0">GDAL2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read-and-write.xhtml#fullcode">完整代码</a></li>
+<li class="toctree-l2"><a class="reference internal" href="read-and-write.xhtml#zipandweb">压缩文件与网络文件读取</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id20">压缩文件</a></li>
+<li class="toctree-l3"><a class="reference internal" href="read-and-write.xhtml#id21">网络文件</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="read-and-write.xhtml#other">其他处理</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-utilities.xhtml">GDAL工具集</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gdal-utilities.xhtml#id3">通用选项</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-utilities.xhtml#gdalinfo">gdalinfo文件信息工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-utilities.xhtml#gdalwarp">gdalwarp 图像纠正工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-utilities.xhtml#gdal-translate">gdal_translate格式转换工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-utilities.xhtml#gdalmanage">gdalmanage文件管理工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-utilities.xhtml#gdallocationinfo">gdallocationinfo像元查询工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-utilities.xhtml#gdaltransform">gdaltransform坐标系转换工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-utilities.xhtml#gdalsrsinfosrs">gdalsrsinfo格式化SRS工具</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-tool-code.xhtml">GDAL工具集代码实现(C/C++)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gdal-tool-code.xhtml#gdalinfo">gdalinfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-tool-code.xhtml#gdalwarp">gdalwarp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-tool-code.xhtml#gdal-translate">gdal_translate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-tool-code.xhtml#ogr2ogr">ogr2ogr</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-alg.xhtml">GDAL算法简介</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gdal-alg.xhtml#id1">GDAL网格插值</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gdal-alg.xhtml#id2">方式一</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdal-alg.xhtml#id3">方式二</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-alg.xhtml#id4">GDAL栅格化</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-cheat-sheet.xhtml">GDAL Cheat Sheet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gdal-cheat-sheet.xhtml#vector-operations">Vector operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-cheat-sheet.xhtml#raster-operations">Raster operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gdal-cheat-sheet.xhtml#other">Other</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-cheat-sheet.xhtml#sources">Sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml">GDALWarp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#id2">GDALWarp简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#gdalwarpoptions">GDALWarpOptions选项介绍</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#id4">几何变换函数简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#id8">完整流程</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#id9">创建输出文件</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#id10">设置选项</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#id11">执行变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#id12">清理环境</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#id13">完整代码</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gdal-warp-api-tutorial.xhtml#optimization">性能优化</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="static-build.xhtml">静态编译</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#id2">编译环境</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#libexpat">libexpat</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#id3">编译前准备</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#libcurl">libcurl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#hdf4">hdf4</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#id4"><code class="docutils literal"><span class="pre">4.2.11</span></code> 以及之前版本</a></li>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#id5"><code class="docutils literal"><span class="pre">4.2.12</span></code> 之后版本</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#hdf5">hdf5</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#id6"><code class="docutils literal"><span class="pre">5.1.8.17</span></code> 之前版本</a></li>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#id8"><code class="docutils literal"><span class="pre">5.1.8.17</span></code> 之后的老版本</a></li>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#id10"><code class="docutils literal"><span class="pre">5.1.10</span></code> 版本</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#netcdf">netcdf</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#netcdf4-3-0">netcdf4.3.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#netcdf4-4-0">netcdf4.4.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#netcdf4-5-0">netcdf4.5.0</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#geos">geos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#proj-4">proj.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#libsqlite3">libsqlite3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#libwebp">libwebp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#openjpeg">openJPEG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#pcre">pcre</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#libkml">libKML</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#spatialite">spatialite</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#libiconv">libiconv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#freexl">FreeXL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#libxml2">libxml2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="static-build.xhtml#id13">spatialite</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#id14">gdal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static-build.xhtml#id15">编译结果下载</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-architecture.xhtml">OGR矢量结构</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ogr-architecture.xhtml#vector">OpenGIS中矢量要素简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-architecture.xhtml#ogroverview">OGR类总览</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-architecture.xhtml#geometry">几何形状</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-architecture.xhtml#spatialreference">空间参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-architecture.xhtml#feature">要素/要素类定义</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-architecture.xhtml#layer">图层</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-architecture.xhtml#datasource">数据源</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-architecture.xhtml#ogrdirver">驱动</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-proj.xhtml">OGR投影简介</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ogr-proj.xhtml#id1">简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-proj.xhtml#id2">定义地理坐标系</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-proj.xhtml#id3">投影坐标系</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-proj.xhtml#id4">查询坐标系统</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-proj.xhtml#id5">坐标转换</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-proj.xhtml#id6">其他语言接口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-proj.xhtml#id7">内部实现</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-read-write.xhtml">矢量数据读写</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ogr-read-write.xhtml#ogrread">数据读取</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-read-write.xhtml#ogrwrite">数据写入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-read-write.xhtml#id4">数据修改</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-sql.xhtml">OGR SQL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ogr-sql.xhtml#id2">简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-sql.xhtml#select">SELECT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-sql.xhtml#special-fields">SPECIAL FIELDS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ogr-sql.xhtml#fid">FID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ogr-sql.xhtml#ogr-geometry">OGR_GEOMETRY</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ogr-sql.xhtml#ogr-geom-wkt">OGR_GEOM_WKT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ogr-sql.xhtml#ogr-geom-area">OGR_GEOM_AREA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ogr-sql.xhtml#ogr-style">OGR_STYLE</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-sql.xhtml#alter-table">ALTER TABLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-sql.xhtml#executesql">ExecuteSQL()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-sql.xhtml#non-ogr-sql">Non-OGR SQL</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sqlite-sql.xhtml">SQLite SQL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sqlite-sql.xhtml#id1">简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sqlite-sql.xhtml#select-statement">SELECT statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sqlite-sql.xhtml#spatialite-sql">Spatialite SQL</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-utilities.xhtml">OGR工具集</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ogr-utilities.xhtml#id1">通用选项</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-utilities.xhtml#ogrinfo">ogrinfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogr-utilities.xhtml#ogr2ogr">ogr2ogr</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables</h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.xhtml"><span class="std std-ref">Index</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GDAL算法简介 &mdash; headfirst gdal 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+    <link rel="canonical" href="hiw1hhggdal-alg.html"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GDAL Cheat Sheet" href="gdal-cheat-sheet.html" />
+    <link rel="prev" title="GDAL工具集代码实现(C/C++)" href="gdal-tool-code.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> headfirst gdal
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preface.html">前言</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">影像是什么</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-data-model.html">GDAL数据模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read-and-write.html">栅格数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-utilities.html">GDAL工具集</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-tool-code.html">GDAL工具集代码实现(C/C++)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GDAL算法简介</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">GDAL网格插值</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">方式一</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">方式二</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">GDAL栅格化</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-cheat-sheet.html">GDAL Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-warp-api-tutorial.html">GDALWarp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="static-build.html">静态编译</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-architecture.html">OGR矢量结构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-proj.html">OGR投影简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-read-write.html">矢量数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-sql.html">OGR SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sqlite-sql.html">SQLite SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-utilities.html">OGR工具集</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">headfirst gdal</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>GDAL算法简介</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/gdal-alg.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gdal">
+<span id="gdalalgs"></span><h1>GDAL算法简介<a class="headerlink" href="#gdal" title="Permalink to this headline">¶</a></h1>
+<p>主要来自 <a class="reference external" href="https://www.gdal.org/pages.html">GDAL RelatePages</a> 等 ,对部分翻译进行了少量修改和更新。暂时只介绍几种用过的算法,以后再加。</p>
+<div class="section" id="id1">
+<h2>GDAL网格插值<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>主要来自 <a class="reference external" href="https://www.gdal.org/grid_tutorial.html">GDAL Grid Tutorial</a></p>
+<p>想要了解插值算法可以看 <a class="reference external" href="https://blog.csdn.net/liminlu0314/article/details/7654279">GDAL源码剖析（十三）之GDAL网格插值说明</a> ,基本是对GDAL文档的翻译</p>
+<p>这里就直接介绍如何使用, <code class="docutils literal"><span class="pre">GDAL</span></code> 里网格插值算法有两大类,使用数据指标或者插值算法,数据指标用的是搜索椭圆内的点的数据指标来算,另一种就是根据离散点插值,有反距离权重等方式.</p>
+<p>插值方式有三种:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>直接使用函数 <code class="docutils literal"><span class="pre">GDALGridCreate</span></code> 创建</li>
+<li>使用 <code class="docutils literal"><span class="pre">GDALGridContextCreate</span></code> <code class="docutils literal"><span class="pre">GDALGridContextProcess</span></code> 和 <code class="docutils literal"><span class="pre">GDALGridContextFree</span></code> ,使用重复参数批量生成插值时,这种方式效率较高</li>
+<li>使用工具方式调用 <code class="docutils literal"><span class="pre">GDALGrid</span></code> 创建,详情见 <a class="reference internal" href="gdal-tool-code.html#gdalutilitieswithcode"><span class="std std-ref">GDAL工具集代码实现(C/C++)</span></a> 部分,此处不再赘述</li>
+</ol>
+</div></blockquote>
+<p>参数比较简单,就不翻译了,直接看代码:</p>
+<div class="section" id="id2">
+<h3>方式一<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">padfX</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">padfY</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">padfZ</span><span class="p">;</span>
+<span class="c1">//TODO: 添加x,y,z离散点,请自行修改</span>
+<span class="p">...</span>
+<span class="c1">//END</span>
+<span class="c1">//算最值</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min_element</span><span class="p">(</span><span class="n">padfX</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">padfX</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+<span class="kt">double</span>  <span class="n">dfXMin</span> <span class="o">=</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+<span class="n">it</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">max_element</span><span class="p">(</span><span class="n">padfX</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">padfX</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+<span class="kt">double</span>  <span class="n">dfXMax</span> <span class="o">=</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+<span class="n">it</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min_element</span><span class="p">(</span><span class="n">padfY</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">padfY</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+<span class="kt">double</span>  <span class="n">dfYMin</span> <span class="o">=</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+<span class="n">it</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">max_element</span><span class="p">(</span><span class="n">padfY</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">padfY</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+<span class="kt">double</span>  <span class="n">dfYMax</span> <span class="o">=</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+<span class="c1">// 离散点内插方法</span>
+<span class="c1">//Linear 先构建Delaunay 三角网,然后用三角网插值,插值速度较快,速度仅与构网的离散点数量有关</span>
+<span class="c1">//无论是何种方式内插,都需要构建Options</span>
+<span class="c1">//插值算法有对应的Option结构体,数据指标(Data Metric)用的是统一的结构体 GDALGridDataMetricsOptions</span>
+<span class="n">GDALGridLinearOptions</span>  <span class="o">*</span><span class="n">poOptions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GDALGridLinearOptions</span><span class="p">();</span>
+<span class="n">poOptions</span><span class="o">-&gt;</span><span class="n">dfNoDataValue</span> <span class="o">=</span> <span class="o">-</span><span class="mi">9999</span><span class="p">;</span>
+<span class="n">poOptions</span><span class="o">-&gt;</span><span class="n">dfRadius</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="c1">//构建GRID</span>
+<span class="kt">double</span> <span class="o">*</span><span class="n">pGridData</span>  <span class="o">=</span>  <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="n">nWidth</span><span class="o">*</span><span class="n">nHeight</span><span class="p">];</span>
+<span class="n">GDALGridCreate</span><span class="p">(</span><span class="n">GGA_Linear</span> <span class="p">,</span><span class="n">poOptions</span><span class="p">,</span><span class="n">padfX</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="o">&amp;</span><span class="p">(</span><span class="n">padfX</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="o">&amp;</span><span class="p">(</span><span class="n">padfY</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="o">&amp;</span><span class="p">(</span><span class="n">padfZ</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>\
+    <span class="n">dfXMin</span><span class="p">,</span> <span class="n">dfXMax</span><span class="p">,</span> <span class="n">dfYMin</span><span class="p">,</span> <span class="n">dfYMax</span><span class="p">,</span> <span class="n">nWidth</span><span class="p">,</span> <span class="n">nHeight</span><span class="p">,</span> <span class="n">GDT_Float64</span><span class="p">,</span> <span class="n">pGridData</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="k">delete</span> <span class="n">poOptions</span><span class="p">;</span>
+<span class="c1">//处理生成的grid</span>
+<span class="p">...</span>
+<span class="k">delete</span><span class="p">[]</span> <span class="n">pGridData</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>方式二<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALGridLinearOptions</span>  <span class="o">*</span><span class="n">poOptions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GDALGridLinearOptions</span><span class="p">();</span>
+<span class="n">poOptions</span><span class="o">-&gt;</span><span class="n">dfNoDataValue</span> <span class="o">=</span> <span class="o">-</span><span class="mi">9999</span><span class="p">;</span>
+<span class="n">poOptions</span><span class="o">-&gt;</span><span class="n">dfRadius</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="c1">//构建GRID</span>
+<span class="kt">double</span> <span class="o">*</span><span class="n">pGridData</span>  <span class="o">=</span>  <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="n">nWidth</span><span class="o">*</span><span class="n">nHeight</span><span class="p">];</span>
+<span class="n">GDALGridContext</span><span class="o">*</span> <span class="n">context</span> <span class="o">=</span> <span class="n">GDALGridContextCreate</span><span class="p">(</span><span class="n">GGA_Linear</span><span class="p">,</span><span class="n">poOptions</span><span class="p">,</span><span class="n">padfX</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="o">&amp;</span><span class="p">(</span><span class="n">padfX</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="o">&amp;</span><span class="p">(</span><span class="n">padfY</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="o">&amp;</span><span class="p">(</span><span class="n">padfZ</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">gwFALSE</span><span class="p">);</span>
+<span class="n">GDALGridContextProcess</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="n">dfXMin</span><span class="p">,</span> <span class="n">dfXMax</span><span class="p">,</span> <span class="n">dfYMin</span><span class="p">,</span> <span class="n">dfYMax</span><span class="p">,</span><span class="n">nWidth</span><span class="p">,</span> <span class="n">nHeight</span><span class="p">,</span> <span class="n">GDT_Float64</span><span class="p">,</span><span class="n">pGridData</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="n">GDALGridContextFree</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
+<span class="c1">//处理生成的grid</span>
+<span class="p">...</span>
+<span class="k">delete</span><span class="p">[]</span> <span class="n">pGridData</span><span class="p">;</span>
+<span class="k">delete</span> <span class="n">poOptions</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<ul class="last simple">
+<li>2.2.3以下的版本中, 网格插值使用 <code class="docutils literal"><span class="pre">GGA_Linear</span></code> 方法可能会崩溃,在2.2.3中修复,可以直接修改源码,可按照
+<a class="reference external" href="https://github.com/OSGeo/gdal/commit/ea2627dc5205e30d3463c64718c3bd147ce0b8c0#diff-62b56095c6ca3aa65387c3b8d95808f9">GDALGrid() with linear algorithm: avoid assertions/segmentation fault…</a>
+中的代码修改</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>GDAL栅格化<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>主要来自 <a class="reference external" href="https://www.gdal.org/gdal__alg_8h.html">gdal_alg.h File Reference</a></p>
+<p>栅格化三个函数类似, <code class="docutils literal"><span class="pre">GDALRasterizeLayers</span>&#160; <span class="pre">GDALRasterizeGeometries</span> <span class="pre">GDALRasterizeLayersBuf</span></code> 需要注意的参数只有     <code class="docutils literal"><span class="pre">padfGeomBurnValue</span></code> 或者 <code class="docutils literal"><span class="pre">dfBurnValue</span></code>
+这个参数是矢量栅格化后的具体值,可以设置为栅格值</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALDataset</span><span class="o">*</span> <span class="n">outDS</span><span class="p">;</span>
+<span class="c1">//创建outDS</span>
+<span class="p">...</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">OGRGeometryH</span><span class="o">&gt;</span> <span class="n">ahGeometries</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">adfFullBurnValues</span><span class="p">;</span>
+<span class="c1">//加入各个几何形状和各个几何形状对应的值</span>
+<span class="c1">//adfFullBurnValues个数为对应ahGeometries乘以波段数,每个波段都需要设置值</span>
+
+<span class="n">ahGeometries</span><span class="p">.</span><span class="n">push_back</span><span class="p">((</span><span class="n">OGRGeometryH</span><span class="p">)</span><span class="n">OgrPolygon</span><span class="p">);</span>
+<span class="n">adfFullBurnValues</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="c1">//几何变换参数,可以参照wrap</span>
+<span class="kt">void</span> <span class="o">*</span> <span class="n">hGenTransformArg</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
+<span class="n">hGenTransformArg</span> <span class="o">=</span> <span class="n">GDALCreateGenImgProjTransformer</span><span class="p">(</span> <span class="nb">NULL</span><span class="p">,</span>
+    <span class="nb">NULL</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">GDALDatasetH</span><span class="p">)</span><span class="n">outDS</span><span class="p">,</span>
+    <span class="n">outDS</span><span class="o">-&gt;</span><span class="n">GetProjectionRef</span><span class="p">(),</span>
+    <span class="nb">false</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="p">);</span>
+<span class="n">CPLErr</span> <span class="n">err</span> <span class="o">=</span> <span class="n">GDALRasterizeGeometries</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span><span class="n">outDS</span><span class="p">,</span>
+                                    <span class="mi">1</span><span class="p">,</span>
+                                    <span class="n">pnbandlist</span><span class="p">,</span>
+                                    <span class="n">ahGeometries</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ahGeometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                    <span class="n">GDALGenImgProjTransform</span><span class="p">,</span>
+                                    <span class="n">hGenTransformArg</span><span class="p">,</span>
+                                    <span class="o">&amp;</span><span class="p">(</span><span class="n">adfFullBurnValues</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                    <span class="n">papszOptions</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="n">GDALDestroyGenImgProjTransformer</span><span class="p">(</span><span class="n">hGenTransformArg</span><span class="p">);</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">outDS</span><span class="p">);</span>
+
+<span class="k">delete</span><span class="p">[]</span><span class="n">pnbandlist</span><span class="p">;</span>
+<span class="k">delete</span><span class="p">[]</span><span class="n">dburnValues</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gdal-cheat-sheet.html" class="btn btn-neutral float-right" title="GDAL Cheat Sheet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="gdal-tool-code.html" class="btn btn-neutral" title="GDAL工具集代码实现(C/C++)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2013-2018, wuqi.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

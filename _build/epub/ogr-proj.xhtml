@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <meta charset="utf-8" />
+    <title>OGR投影简介</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> 
+  </head>
+  <body>
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ogr">
+<span id="ogrproj"></span><h1>OGR投影简介</h1>
+<p>本章来源： <a class="reference external" href="http://www.gdal.org/osr_tutorial.html">OGR Projections Tutorial</a><span class="link-target"> [http://www.gdal.org/osr_tutorial.html]</span></p>
+<div class="section" id="id1">
+<h2>简介</h2>
+<p><code class="docutils literal"><span class="pre">OGRSpatialReference</span></code> ，和 <code class="docutils literal"><span class="pre">OGRCoordinateTransformation</span></code> 类提供的表达坐标系统（投影和基准面）和它们之间的变换的接口。这些服务是仿照OpenGIS规范的坐标变换，并使用WKT格式描述的坐标系统。</p>
+<p><a class="reference external" href="http://www.opengeospatial.org/standards/sfo/">Simple Features for COM</a><span class="link-target"> [http://www.opengeospatial.org/standards/sfo/]</span> 中可以找到 <code class="docutils literal"><span class="pre">OpenGIS</span></code> 坐标系统和服务的介绍， <code class="docutils literal"><span class="pre">Spatial</span> <span class="pre">Reference</span> <span class="pre">Systems</span> <span class="pre">Abstract</span> <span class="pre">Model</span></code> 的介绍可以在 <a class="reference external" href="http://www.opengeospatial.org/">OGC</a><span class="link-target"> [http://www.opengeospatial.org/]</span> 网站上找到。 <a class="reference external" href="http://www.remotesensing.org/geotiff/proj_list/">GeoTIFF Projections Transform List</a><span class="link-target"> [http://www.remotesensing.org/geotiff/proj_list/]</span> 中也可以找到WKT的一些说明。 <a class="reference external" href="http://www.epsg.org/">EPSG Geodesy</a><span class="link-target"> [http://www.epsg.org/]</span> 网站上的资源也非常有用.</p>
+</div>
+<div class="section" id="id2">
+<h2>定义地理坐标系</h2>
+<p>坐标系统被封装在  <code class="docutils literal"><span class="pre">OGRSpatialReference</span></code> 类中。有许多方法将 <code class="docutils literal"><span class="pre">OGRSpatialReference</span></code> 对象初始化为一个有效的坐标系统。有两种主要的坐标系统，地理坐标系（经纬度投影）和投影坐标系（如UTM，单位为米或英尺）。</p>
+<p>地理坐标系统包含的基准面信息（半长轴，扁率），本初子午线（通常是格林尼治），和单位类型（通常是度）。下面的代码是地理坐标系统实例:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>OGRSpatialReference oSRS;
+oSRS.SetGeogCS( &quot;My geographic coordinate system&quot;,
+                &quot;WGS_1984&quot;,
+                &quot;My WGS84 Spheroid&quot;,
+                SRS_WGS84_SEMIMAJOR, SRS_WGS84_INVFLATTENING,
+                &quot;Greenwich&quot;, 0.0,
+                &quot;degree&quot;, SRS_UA_DEGREE_CONV );
+</pre></div>
+</div>
+<p>上面的代码中，“My geographic coordinate system”、“My WGS84 Spheroid”、“Greenwich”和“degree”不是关键，主要用于向用户显示投影信息。然而，“WGS_1984” 作为确定基准面的关键，是需要遵循一定规则的。</p>
+<p>OGRSpatialReference中已有很多的坐标系统的支持，其中包括“NAD27”、“NAD83”、“wgs72”和“WGS84”等，可以直接调用SetWellKnownGeogCS()获取</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">oSRS</span><span class="p">.</span><span class="n">SetWellKnownGeogCS</span><span class="p">(</span> <span class="s">&quot;WGS84&quot;</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>此外，可以使用EPSG数据库中的GCS码数表示投影</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">oSRS</span><span class="p">.</span><span class="n">SetWellKnownGeogCS</span><span class="p">(</span> <span class="s">&quot;EPSG:4326&quot;</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">OGRSpatialReference</span></code> 可以调用函数将投影序列化,转为WKT串或者其他形式输出。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">char</span>    <span class="o">*</span><span class="n">pszWKT</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">oSRS</span><span class="p">.</span><span class="n">SetWellKnownGeogCS</span><span class="p">(</span> <span class="s">&quot;WGS84&quot;</span> <span class="p">);</span>
+<span class="n">oSRS</span><span class="p">.</span><span class="n">exportToWkt</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">pszWKT</span> <span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">pszWKT</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>输出为:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>GEOGCS[&quot;WGS 84&quot;,
+    DATUM[&quot;WGS_1984&quot;,
+        SPHEROID[&quot;WGS 84&quot;,6378137,298.257223563,
+            AUTHORITY[&quot;EPSG&quot;,7030]],
+        TOWGS84[0,0,0,0,0,0,0],
+        AUTHORITY[&quot;EPSG&quot;,6326]],
+    PRIMEM[&quot;Greenwich&quot;,0,AUTHORITY[&quot;EPSG&quot;,8901]],
+    UNIT[&quot;DMSH&quot;,0.0174532925199433,AUTHORITY[&quot;EPSG&quot;,9108]],
+    AXIS[&quot;Lat&quot;,NORTH],
+    AXIS[&quot;Long&quot;,EAST],
+    AUTHORITY[&quot;EPSG&quot;,4326]]
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">OGRSpatialReference::importFromWkt()</span></code> 方法可以用WKT坐标系统定义。</p>
+</div>
+<div class="section" id="id3">
+<h2>投影坐标系</h2>
+<p>投影坐标系统（如UTM、Lambert Conformal Conic等）默认包含了一个地理坐标系统，以及一个平面坐标与地理坐标相互转换的描述。下面的代码定义了一个UTM 17号带投影，默认为WGS84地理坐标系统。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">OGRSpatialReference</span>     <span class="n">oSRS</span><span class="p">;</span>
+<span class="n">oSRS</span><span class="p">.</span><span class="n">SetProjCS</span><span class="p">(</span> <span class="s">&quot;UTM 17 (WGS84) in northern hemisphere.&quot;</span> <span class="p">);</span>
+<span class="n">oSRS</span><span class="p">.</span><span class="n">SetWellKnownGeogCS</span><span class="p">(</span> <span class="s">&quot;WGS84&quot;</span> <span class="p">);</span>
+<span class="n">oSRS</span><span class="p">.</span><span class="n">SetUTM</span><span class="p">(</span> <span class="mi">17</span><span class="p">,</span> <span class="n">TRUE</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>调用 <code class="docutils literal"><span class="pre">SetProjCS()</span></code> 函数 设置投影名称。<code class="docutils literal"><span class="pre">SetWellKnownGeogCS()</span> <span class="pre">``</span> <span class="pre">设置地理坐标系统，</span> <span class="pre">``SetUTM()</span></code> 设置详细的投影变换参数。在现有版本中，上述步骤顺序不可颠倒，否则无法生成有效投影。</p>
+<p>上述定义将WKT版本如下。请注意，UTM 17 在描述参数中被定义:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>PROJCS[&quot;UTM 17 (WGS84) in northern hemisphere.&quot;,
+    GEOGCS[&quot;WGS 84&quot;,
+        DATUM[&quot;WGS_1984&quot;,
+            SPHEROID[&quot;WGS 84&quot;,6378137,298.257223563,
+                AUTHORITY[&quot;EPSG&quot;,7030]],
+            TOWGS84[0,0,0,0,0,0,0],
+            AUTHORITY[&quot;EPSG&quot;,6326]],
+        PRIMEM[&quot;Greenwich&quot;,0,AUTHORITY[&quot;EPSG&quot;,8901]],
+        UNIT[&quot;DMSH&quot;,0.0174532925199433,AUTHORITY[&quot;EPSG&quot;,9108]],
+        AXIS[&quot;Lat&quot;,NORTH],
+        AXIS[&quot;Long&quot;,EAST],
+        AUTHORITY[&quot;EPSG&quot;,4326]],
+    PROJECTION[&quot;Transverse_Mercator&quot;],
+    PARAMETER[&quot;latitude_of_origin&quot;,0],
+    PARAMETER[&quot;central_meridian&quot;,-81],
+    PARAMETER[&quot;scale_factor&quot;,0.9996],
+    PARAMETER[&quot;false_easting&quot;,500000],
+    PARAMETER[&quot;false_northing&quot;,0]]
+</pre></div>
+</div>
+<p>有许多投影方法包括settm()方法（横轴），setlcc()（Lambert Conformal Conic），和setmercator()。</p>
+</div>
+<div class="section" id="id4">
+<h2>查询坐标系统</h2>
+<p>一旦一个 <code class="docutils literal"><span class="pre">OGRSpatialReference</span></code> 已经建立，它的信息可以被查询。</p>
+<ul class="simple">
+<li><p><code class="docutils literal"><span class="pre">OGRSpatialReference::IsProjected()</span></code> <code class="docutils literal"><span class="pre">OGRSpatialReference::IsGeographic()</span></code> 函数确定投影类型</p></li>
+<li><p><code class="docutils literal"><span class="pre">OGRSpatialReference::GetSemiMajor()</span></code> , <code class="docutils literal"><span class="pre">OGRSpatialReference::GetSemiMinor()</span></code>   <code class="docutils literal"><span class="pre">OGRSpatialReference::GetInvFlattening()</span></code> 方法可用于获取有关球体的信息。</p></li>
+<li><p><code class="docutils literal"><span class="pre">OGRSpatialReference::GetAttrValue()</span></code>  方法可以用来获得projcs，geogcs，基准，球体，和投影名称的字符串</p></li>
+<li><p><code class="docutils literal"><span class="pre">OGRSpatialReference::GetProjParm()</span></code> 方法可用于获取投影参数。</p></li>
+<li><p><code class="docutils literal"><span class="pre">OGRSpatialReference::GetLinearUnits()</span></code> 方法可用于获取投影的单位,可以转化到米。</p></li>
+</ul>
+<p>下面的代码演示了如何获取信息:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pszProjection</span> <span class="o">=</span> <span class="n">poSRS</span><span class="o">-&gt;</span><span class="n">GetAttrValue</span><span class="p">(</span><span class="s">&quot;PROJECTION&quot;</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span> <span class="n">pszProjection</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poSRS</span><span class="o">-&gt;</span><span class="n">IsGeographic</span><span class="p">()</span> <span class="p">)</span>
+        <span class="n">sprintf</span><span class="p">(</span> <span class="n">szProj4</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">szProj4</span><span class="p">),</span> <span class="s">&quot;+proj=longlat &quot;</span> <span class="p">);</span>
+    <span class="k">else</span>
+        <span class="nf">sprintf</span><span class="p">(</span> <span class="n">szProj4</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">szProj4</span><span class="p">),</span> <span class="s">&quot;unknown &quot;</span> <span class="p">);</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span><span class="p">(</span> <span class="n">EQUAL</span><span class="p">(</span><span class="n">pszProjection</span><span class="p">,</span><span class="n">SRS_PT_CYLINDRICAL_EQUAL_AREA</span><span class="p">)</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">sprintf</span><span class="p">(</span> <span class="n">szProj4</span><span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">szProj4</span><span class="p">),</span>
+       <span class="s">&quot;+proj=cea +lon_0=%.9f +lat_ts=%.9f +x_0=%.3f +y_0=%.3f &quot;</span><span class="p">,</span>
+             <span class="n">poSRS</span><span class="o">-&gt;</span><span class="n">GetProjParm</span><span class="p">(</span><span class="n">SRS_PP_CENTRAL_MERIDIAN</span><span class="p">,</span><span class="mf">0.0</span><span class="p">),</span>
+             <span class="n">poSRS</span><span class="o">-&gt;</span><span class="n">GetProjParm</span><span class="p">(</span><span class="n">SRS_PP_STANDARD_PARALLEL_1</span><span class="p">,</span><span class="mf">0.0</span><span class="p">),</span>
+             <span class="n">poSRS</span><span class="o">-&gt;</span><span class="n">GetProjParm</span><span class="p">(</span><span class="n">SRS_PP_FALSE_EASTING</span><span class="p">,</span><span class="mf">0.0</span><span class="p">),</span>
+             <span class="n">poSRS</span><span class="o">-&gt;</span><span class="n">GetProjParm</span><span class="p">(</span><span class="n">SRS_PP_FALSE_NORTHING</span><span class="p">,</span><span class="mf">0.0</span><span class="p">)</span> <span class="p">);</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>坐标转换</h2>
+<p><code class="docutils literal"><span class="pre">OGRCoordinateTransformation</span></code> 类用于不同坐标系之间的转换。使用 <code class="docutils literal"><span class="pre">OGRCreateCoordinateTransformation()</span></code>  创建转换对象，然后调用 <code class="docutils literal"><span class="pre">OGRCoordinateTransformation::Transform()</span></code> 方法转换坐标。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">OGRSpatialReference</span> <span class="n">oSourceSRS</span><span class="p">,</span> <span class="n">oTargetSRS</span><span class="p">;</span>
+<span class="n">OGRCoordinateTransformation</span> <span class="o">*</span><span class="n">poCT</span><span class="p">;</span>
+<span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+
+<span class="n">oSourceSRS</span><span class="p">.</span><span class="n">importFromEPSG</span><span class="p">(</span> <span class="n">atoi</span><span class="p">(</span> <span class="n">papszArgv</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">);</span>
+<span class="n">oTargetSRS</span><span class="p">.</span><span class="n">importFromEPSG</span><span class="p">(</span> <span class="n">atoi</span><span class="p">(</span> <span class="n">papszArgv</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="p">)</span> <span class="p">);</span>
+
+<span class="n">poCT</span> <span class="o">=</span> <span class="n">OGRCreateCoordinateTransformation</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">oSourceSRS</span><span class="p">,</span>
+       <span class="o">&amp;</span><span class="n">oTargetSRS</span> <span class="p">);</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">papszArgv</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="p">);</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">papszArgv</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span> <span class="n">poCT</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="o">!</span><span class="n">poCT</span><span class="o">-&gt;</span><span class="n">Transform</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">y</span> <span class="p">)</span> <span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Transformation failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;(%f,%f) -&gt; (%f,%f)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+          <span class="n">atof</span><span class="p">(</span> <span class="n">papszArgv</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="p">),</span>
+          <span class="n">atof</span><span class="p">(</span> <span class="n">papszArgv</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="p">),</span>
+          <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>投影转换失败可能原因如下:</p>
+<ul class="simple">
+<li><p><code class="docutils literal"><span class="pre">OGRCreateCoordinateTransformation()</span></code>  可能会失败，一般是因为系统之间可以建立没有变换。这可能是由于PROJ.4库不支持。如果 <code class="docutils literal"><span class="pre">OGRCreateCoordinateTransformation()</span></code> 失败，它将返回一个null。</p></li>
+<li><p><code class="docutils literal"><span class="pre">OGRCoordinateTransformation::Transform()</span></code> 方法本身也会失败。</p></li>
+</ul>
+<p>上述代码中没有演示三维点转换，但是该函数是可以用于三维点转换的，如果没有传入Z值，假设点在大地水准面上。</p>
+<p>下面的示例演示如何方便地创建一个纬度/经度坐标系统使用相同的地理坐标系统和投影坐标系，并利用这些投影坐标和经纬度之间的转换。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">OGRSpatialReference</span>    <span class="n">oUTM</span><span class="p">,</span> <span class="o">*</span><span class="n">poLatLong</span><span class="p">;</span>
+<span class="n">OGRCoordinateTransformation</span> <span class="o">*</span><span class="n">poTransform</span><span class="p">;</span>
+<span class="n">oUTM</span><span class="p">.</span><span class="n">SetProjCS</span><span class="p">(</span><span class="s">&quot;UTM 17 / WGS84&quot;</span><span class="p">);</span>
+<span class="n">oUTM</span><span class="p">.</span><span class="n">SetWellKnownGeogCS</span><span class="p">(</span> <span class="s">&quot;WGS84&quot;</span> <span class="p">);</span>
+<span class="n">oUTM</span><span class="p">.</span><span class="n">SetUTM</span><span class="p">(</span> <span class="mi">17</span> <span class="p">);</span>
+<span class="n">poLatLong</span> <span class="o">=</span> <span class="n">oUTM</span><span class="p">.</span><span class="n">CloneGeogCS</span><span class="p">();</span>
+<span class="n">poTransform</span> <span class="o">=</span> <span class="n">OGRCreateCoordinateTransformation</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">oUTM</span><span class="p">,</span> <span class="n">poLatLong</span> <span class="p">);</span>
+<span class="k">if</span><span class="p">(</span> <span class="n">poTransform</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+<span class="p">...</span>
+<span class="k">if</span><span class="p">(</span> <span class="o">!</span><span class="n">poTransform</span><span class="o">-&gt;</span><span class="n">Transform</span><span class="p">(</span> <span class="n">nPoints</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>其他语言接口</h2>
+<p>C接口定义的坐标系统服务 <code class="docutils literal"><span class="pre">ogr_srs_api.h</span></code> ，和Python绑定可以通过 <code class="docutils literal"><span class="pre">osr.py</span></code> 模块。其他语言用法类似c++，但是缺少一些方法。</p>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="kt">void</span> <span class="o">*</span><span class="n">OGRSpatialReferenceH</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="kt">void</span> <span class="o">*</span><span class="n">OGRCoordinateTransformationH</span><span class="p">;</span>
+<span class="n">OGRSpatialReferenceH</span> <span class="nf">OSRNewSpatialReference</span><span class="p">(</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="p">);</span>
+<span class="kt">void</span>    <span class="nf">OSRDestroySpatialReference</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="p">);</span>
+<span class="kt">int</span>     <span class="nf">OSRReference</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="p">);</span>
+<span class="kt">int</span>     <span class="nf">OSRDereference</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRImportFromEPSG</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="kt">int</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRImportFromWkt</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRExportToWkt</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRSetAttrValue</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszNodePath</span><span class="p">,</span>
+                         <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszNewNodeValue</span> <span class="p">);</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="nf">OSRGetAttrValue</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span>
+                             <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszName</span><span class="p">,</span> <span class="kt">int</span> <span class="n">iChild</span><span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRSetLinearUnits</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">,</span> <span class="kt">double</span> <span class="p">);</span>
+<span class="kt">double</span>  <span class="nf">OSRGetLinearUnits</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span> <span class="p">);</span>
+<span class="kt">int</span>     <span class="nf">OSRIsGeographic</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="p">);</span>
+<span class="kt">int</span>     <span class="nf">OSRIsProjected</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="p">);</span>
+<span class="kt">int</span>     <span class="nf">OSRIsSameGeogCS</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="n">OGRSpatialReferenceH</span> <span class="p">);</span>
+<span class="kt">int</span>     <span class="nf">OSRIsSame</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="n">OGRSpatialReferenceH</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRSetProjCS</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszName</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRSetWellKnownGeogCS</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span>
+                               <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszName</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRSetGeogCS</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span>
+                      <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszGeogName</span><span class="p">,</span>
+                      <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszDatumName</span><span class="p">,</span>
+                      <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszEllipsoidName</span><span class="p">,</span>
+                      <span class="kt">double</span> <span class="n">dfSemiMajor</span><span class="p">,</span> <span class="kt">double</span> <span class="n">dfInvFlattening</span><span class="p">,</span>
+                      <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszPMName</span> <span class="p">,</span>
+                      <span class="kt">double</span> <span class="n">dfPMOffset</span> <span class="p">,</span>
+                      <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszUnits</span><span class="p">,</span>
+                      <span class="kt">double</span> <span class="n">dfConvertToRadians</span> <span class="p">);</span>
+<span class="kt">double</span>  <span class="nf">OSRGetSemiMajor</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="n">OGRErr</span> <span class="o">*</span> <span class="p">);</span>
+<span class="kt">double</span>  <span class="nf">OSRGetSemiMinor</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="n">OGRErr</span> <span class="o">*</span> <span class="p">);</span>
+<span class="kt">double</span>  <span class="nf">OSRGetInvFlattening</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="n">OGRErr</span> <span class="o">*</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRSetAuthority</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span>
+                         <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszTargetKey</span><span class="p">,</span>
+                         <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszAuthority</span><span class="p">,</span>
+                         <span class="kt">int</span> <span class="n">nCode</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRSetProjParm</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">,</span> <span class="kt">double</span> <span class="p">);</span>
+<span class="kt">double</span>  <span class="nf">OSRGetProjParm</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span>
+                        <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">pszParmName</span><span class="p">,</span>
+                        <span class="kt">double</span> <span class="n">dfDefault</span><span class="p">,</span>
+                        <span class="n">OGRErr</span> <span class="o">*</span> <span class="p">);</span>
+<span class="n">OGRErr</span>  <span class="nf">OSRSetUTM</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nZone</span><span class="p">,</span> <span class="kt">int</span> <span class="n">bNorth</span> <span class="p">);</span>
+<span class="kt">int</span>     <span class="nf">OSRGetUTMZone</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSRS</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">pbNorth</span> <span class="p">);</span>
+<span class="n">OGRCoordinateTransformationH</span>
+<span class="nf">OCTNewCoordinateTransformation</span><span class="p">(</span> <span class="n">OGRSpatialReferenceH</span> <span class="n">hSourceSRS</span><span class="p">,</span>
+                                <span class="n">OGRSpatialReferenceH</span> <span class="n">hTargetSRS</span> <span class="p">);</span>
+<span class="kt">void</span> <span class="nf">OCTDestroyCoordinateTransformation</span><span class="p">(</span> <span class="n">OGRCoordinateTransformationH</span> <span class="p">);</span>
+<span class="kt">int</span> <span class="nf">OCTTransform</span><span class="p">(</span> <span class="n">OGRCoordinateTransformationH</span> <span class="n">hCT</span><span class="p">,</span>
+                  <span class="kt">int</span> <span class="n">nCount</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">z</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Python 接口:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">osr</span><span class="o">.</span><span class="n">SpatialReference</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ImportFromWkt</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">wkt</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ExportToWkt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ImportFromEPSG</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">code</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">IsGeographic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">IsProjected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">GetAttrValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">child</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">SetAttrValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">SetWellKnownGeogCS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">SetProjCS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;unnamed&quot;</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">IsSameGeogCS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">IsSame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">SetLinearUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units_name</span><span class="p">,</span> <span class="n">to_meters</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">SetUTM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">is_north</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">CoordinateTransformation</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">source</span><span class="p">,</span><span class="n">target</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">TransformPoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">TransformPoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>内部实现</h2>
+<p>内部实现基于 <code class="docutils literal"><span class="pre">PROJ.4</span></code> 库,接口为 <code class="docutils literal"><span class="pre">OGRCoordinateTransformation</span></code></p>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

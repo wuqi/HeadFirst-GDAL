@@ -1,0 +1,471 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GDAL工具集代码实现(C/C++) &mdash; headfirst gdal 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+    <link rel="canonical" href="hiw1hhggdal-tool-code.html"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GDAL算法简介" href="gdal-alg.html" />
+    <link rel="prev" title="GDAL工具集" href="gdal-utilities.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> headfirst gdal
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preface.html">前言</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">影像是什么</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-data-model.html">GDAL数据模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read-and-write.html">栅格数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-utilities.html">GDAL工具集</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GDAL工具集代码实现(C/C++)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gdalinfo">gdalinfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gdalwarp">gdalwarp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gdal-translate">gdal_translate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ogr2ogr">ogr2ogr</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-alg.html">GDAL算法简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-cheat-sheet.html">GDAL Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-warp-api-tutorial.html">GDALWarp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="static-build.html">静态编译</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-architecture.html">OGR矢量结构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-proj.html">OGR投影简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-read-write.html">矢量数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-sql.html">OGR SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sqlite-sql.html">SQLite SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-utilities.html">OGR工具集</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">headfirst gdal</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>GDAL工具集代码实现(C/C++)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/gdal-tool-code.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gdal-c-c">
+<span id="gdalutilitieswithcode"></span><h1>GDAL工具集代码实现(C/C++)<a class="headerlink" href="#gdal-c-c" title="Permalink to this headline">¶</a></h1>
+<p><cite>GDAL2.0</cite> 开始，可以使用代码实现GDAL工具集的功能，即可以使用代码调用gdal工具集，可以提升编码效率。需要注意,使用参数时,需要逐个添加,不能一行按照空格添加。</p>
+<p>下面主要介绍 <code class="docutils literal"><span class="pre">gdalinfo</span></code> <code class="docutils literal"><span class="pre">gdalwarp</span></code> <code class="docutils literal"><span class="pre">gdal_translate</span></code>  <code class="docutils literal"><span class="pre">ogr2ogr</span></code>  几个常用工具的代码实现,其他可用工具见  <a class="reference external" href="http://www.gdal.org/gdal__utils_8h.html">GDAL官网gdal_utils.h: GDAL Utilities C API</a>  说明,包括  <code class="docutils literal"><span class="pre">gdaldem</span></code>  <code class="docutils literal"><span class="pre">gdal_rasterize</span></code>  <code class="docutils literal"><span class="pre">nearblack</span></code>   <code class="docutils literal"><span class="pre">gdal_grid</span></code>  <code class="docutils literal"><span class="pre">gdalbuildvrt</span></code> 几个工具，其余工具官方正在添加。</p>
+<p>使用前,需要添加以下头文件:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;gdal_priv.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;cpl_string.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;gdal_utils.h&quot;</span><span class="cp"></span>
+</pre></div>
+</div>
+<div class="section" id="gdalinfo">
+<h2>gdalinfo<a class="headerlink" href="#gdalinfo" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="gdal-utilities.html#gdalinfo"><span class="std std-ref">gdalinfo文件信息工具</span></a>  工具功能可以使用 <code class="docutils literal"><span class="pre">GDALInfo</span></code> 函数实现，具体定义如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">* @param hDataset   需要获取信息的数据集</span>
+<span class="cm">* @param psOptions  gdalinfo命令参数</span>
+<span class="cm">* @return 返回数据集信息</span>
+<span class="cm">*/</span>
+<span class="kt">char</span><span class="o">*</span> <span class="n">GDALInfo</span>      <span class="p">(</span>       <span class="n">GDALDatasetH</span>    <span class="n">hDataset</span><span class="p">,</span>
+<span class="k">const</span> <span class="n">GDALInfoOptions</span> <span class="o">*</span>     <span class="n">psOptions</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>基本使用方式如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="n">GDALDatasetH</span> <span class="n">TestDs</span> <span class="o">=</span> <span class="n">GDALOpen</span><span class="p">(</span> <span class="s">&quot;testfile.tiff&quot;</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span>
+<span class="kt">char</span><span class="o">*</span> <span class="n">info</span> <span class="o">=</span> <span class="n">GDALInfo</span><span class="p">(</span><span class="n">TestDs</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">info</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="c1">//do something</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">TestDs</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>如果需要使用命令行参数,则需要创建 <code class="docutils literal"><span class="pre">GDALInfoOptions</span></code> 代码如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="c1">//添加命令参数</span>
+<span class="kt">char</span> <span class="o">**</span><span class="n">argv</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;-json&quot;</span><span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;-hist&quot;</span><span class="p">);</span>
+<span class="n">GDALInfoOptions</span> <span class="o">*</span><span class="n">opt</span> <span class="o">=</span> <span class="n">GDALInfoOptionsNew</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+<span class="n">GDALDatasetH</span> <span class="n">TestDs</span> <span class="o">=</span> <span class="n">GDALOpen</span><span class="p">(</span> <span class="s">&quot;testfile.tiff&quot;</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span>
+<span class="kt">char</span><span class="o">*</span> <span class="n">info</span> <span class="o">=</span> <span class="n">GDALInfo</span><span class="p">(</span><span class="n">TestDs</span><span class="p">,</span><span class="n">opt</span><span class="p">);</span>
+<span class="n">GDALInfoOptionsFree</span><span class="p">(</span><span class="n">opt</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">info</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="c1">//do something</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">TestDs</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="gdalwarp">
+<h2>gdalwarp<a class="headerlink" href="#gdalwarp" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="gdal-utilities.html#gdalwarptool"><span class="std std-ref">gdalwarp 图像纠正工具</span></a>  工具功能可以使用 <code class="docutils literal"><span class="pre">GDALWarp</span></code> 函数实现，具体定义如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">* @param pszDest      输出路径,或者NULL</span>
+<span class="cm">* @param hDstDS       输出数据集或为NULL(前两参数必须选一)</span>
+<span class="cm">* @param nSrcCount    输入数据集个数</span>
+<span class="cm">* @param pahSrcDS     输入数据集列表</span>
+<span class="cm">* @param psOptionsIn  命令行参数</span>
+<span class="cm">* @param pbUsageError 返回值,标识错误信息</span>
+<span class="cm">* @return  输出数据集(如果hDstDS为NULL,返回的数据集必须使用GDALClose关闭)</span>
+<span class="cm">*/</span>
+<span class="n">GDALDatasetH</span> <span class="n">GDALWarp</span>       <span class="p">(</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>    <span class="n">pszDest</span><span class="p">,</span>
+    <span class="n">GDALDatasetH</span>    <span class="n">hDstDS</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nSrcCount</span><span class="p">,</span>
+    <span class="n">GDALDatasetH</span> <span class="o">*</span>  <span class="n">pahSrcDS</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">GDALWarpAppOptions</span> <span class="o">*</span>      <span class="n">psOptionsIn</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="o">*</span>   <span class="n">pbUsageError</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>基本使用方式如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="c1">//添加命令参数,每次添加一个!!!</span>
+<span class="kt">char</span> <span class="o">**</span><span class="n">argv</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;-order&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;3&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;-ts&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;1000&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;1000&quot;</span> <span class="p">);</span>
+
+<span class="c1">//错误实例!!!!</span>
+<span class="c1">//error!!!!</span>
+<span class="c1">//////argv = CSLAddString( argv, &quot;-order 3 -ts 1000 1000&quot; );//此写法错误,按照上面写!!!!</span>
+<span class="c1">//error!!!!</span>
+
+<span class="c1">//返回</span>
+<span class="kt">int</span> <span class="n">bUsageError</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+<span class="c1">//输入列表</span>
+<span class="n">GDALDatasetH</span> <span class="n">TestDs</span> <span class="o">=</span> <span class="n">GDALOpen</span><span class="p">(</span><span class="s">&quot;test.tif&quot;</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span>
+<span class="c1">//gdalwarp</span>
+<span class="n">GDALWarpAppOptions</span> <span class="o">*</span><span class="n">opt</span> <span class="o">=</span> <span class="n">GDALWarpAppOptionsNew</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">dst</span> <span class="o">=</span> <span class="p">(</span> <span class="n">GDALDataset</span> <span class="o">*</span> <span class="p">)</span><span class="n">GDALWarp</span><span class="p">(</span> <span class="s">&quot;out.tif&quot;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>\
+                   <span class="o">&amp;</span><span class="n">TestDs</span> <span class="p">,</span><span class="n">opt</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bUsageError</span> <span class="p">);</span>
+<span class="n">GDALWarpAppOptionsFree</span><span class="p">(</span> <span class="n">opt</span> <span class="p">);</span>
+<span class="n">CSLDestroy</span><span class="p">(</span> <span class="n">argv</span> <span class="p">);</span>
+<span class="c1">//do something</span>
+<span class="c1">//clear env</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">dst</span><span class="p">);</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">TestDs</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>如果有多个文件输入,使用如下代码:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="c1">//添加命令参数,每次添加一个!!!</span>
+<span class="kt">char</span> <span class="o">**</span><span class="n">argv</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;-order&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;3&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;-ts&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;1000&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;1000&quot;</span> <span class="p">);</span>
+
+<span class="c1">//错误实例!!!!</span>
+<span class="c1">//error!!!!</span>
+<span class="c1">//////argv = CSLAddString( argv, &quot;-order 3 -ts 1000 1000&quot; );//此写法错误,按照上面写!!!!</span>
+<span class="c1">//error!!!!</span>
+
+<span class="c1">//返回</span>
+<span class="kt">int</span> <span class="n">bUsageError</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+<span class="c1">//输入列表</span>
+<span class="n">GDALDatasetH</span> <span class="n">TestDs</span> <span class="o">=</span> <span class="n">GDALOpen</span><span class="p">(</span><span class="s">&quot;test.tif&quot;</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span>
+<span class="n">GDALDatasetH</span> <span class="o">*</span><span class="n">srcList</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">srcList</span> <span class="o">=</span> <span class="p">(</span> <span class="n">GDALDatasetH</span> <span class="o">*</span> <span class="p">)</span> <span class="n">CPLRealloc</span><span class="p">(</span> <span class="n">srcList</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span> <span class="n">GDALDatasetH</span> <span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="p">);</span>
+<span class="n">srcList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">TestDs</span><span class="p">;</span><span class="c1">//有多少写多少</span>
+<span class="c1">//gdalwarp</span>
+<span class="n">GDALWarpAppOptions</span> <span class="o">*</span><span class="n">opt</span> <span class="o">=</span> <span class="n">GDALWarpAppOptionsNew</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">dst</span> <span class="o">=</span> <span class="p">(</span> <span class="n">GDALDataset</span> <span class="o">*</span> <span class="p">)</span><span class="n">GDALWarp</span><span class="p">(</span> <span class="s">&quot;out.tif&quot;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>\
+                   <span class="n">srcList</span> <span class="p">,</span><span class="n">opt</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bUsageError</span> <span class="p">);</span>
+<span class="n">GDALWarpAppOptionsFree</span><span class="p">(</span> <span class="n">opt</span> <span class="p">);</span>
+<span class="n">CSLDestroy</span><span class="p">(</span> <span class="n">argv</span> <span class="p">);</span>
+<span class="c1">//do something</span>
+<span class="c1">//clear env</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">dst</span><span class="p">);</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">TestDs</span><span class="p">);</span>
+<span class="n">CPLFree</span><span class="p">(</span><span class="n">srcList</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="gdal-translate">
+<h2>gdal_translate<a class="headerlink" href="#gdal-translate" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="gdal-utilities.html#gdal-translate"><span class="std std-ref">gdal_translate格式转换工具</span></a>  工具功能可以使用 <code class="docutils literal"><span class="pre">GDALTranslate</span></code> 函数实现，具体定义如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">* @param pszDest      输出路径</span>
+<span class="cm">* @param hSrcDataset  输入数据集</span>
+<span class="cm">* @param psOptionsIn  命令行参数,可以为空</span>
+<span class="cm">* @param pbUsageError 返回值,标识错误信息</span>
+<span class="cm">* @return  输出数据集(如果hDstDS为NULL,返回的数据集必须使用GDALClose关闭)</span>
+<span class="cm">*/</span>
+<span class="n">GDALDatasetH</span> <span class="n">GDALTranslate</span>  <span class="p">(</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>    <span class="n">pszDest</span><span class="p">,</span>
+    <span class="n">GDALDatasetH</span>    <span class="n">hSrcDataset</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">GDALTranslateOptions</span> <span class="o">*</span>    <span class="n">psOptionsIn</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="o">*</span>   <span class="n">pbUsageError</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>基本使用方式如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="c1">//添加命令参数,每次添加一个!!!</span>
+<span class="kt">char</span> <span class="o">**</span><span class="n">argv</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;-ot&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;UInt16&quot;</span> <span class="p">);</span>
+
+<span class="c1">//错误实例!!!!</span>
+<span class="c1">//error!!!!</span>
+<span class="c1">//////argv = CSLAddString( argv, &quot;-ot UInt16&quot; );//此写法错误,按照上面写!!!!</span>
+<span class="c1">//error!!!!</span>
+
+<span class="c1">//返回</span>
+<span class="kt">int</span> <span class="n">bUsageError</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+<span class="c1">//输入列表</span>
+<span class="n">GDALDatasetH</span> <span class="n">TestDs</span> <span class="o">=</span> <span class="n">GDALOpen</span><span class="p">(</span> <span class="s">&quot;test.tif&quot;</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span>
+<span class="c1">//GDALTranslate</span>
+<span class="n">GDALTranslateOptions</span> <span class="o">*</span><span class="n">opt</span> <span class="o">=</span>  <span class="n">GDALTranslateOptionsNew</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">dst</span> <span class="o">=</span> <span class="p">(</span> <span class="n">GDALDataset</span> <span class="o">*</span> <span class="p">)</span><span class="n">GDALTranslate</span><span class="p">(</span> <span class="s">&quot;out.tif&quot;</span><span class="p">,</span> <span class="n">TestDs</span> <span class="p">,</span><span class="n">opt</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bUsageError</span> <span class="p">);</span>
+<span class="n">GDALTranslateOptionsFree</span><span class="p">(</span> <span class="n">opt</span> <span class="p">);</span>
+<span class="n">CSLDestroy</span><span class="p">(</span> <span class="n">argv</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ogr2ogr">
+<h2>ogr2ogr<a class="headerlink" href="#ogr2ogr" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">ogr2ogr</span></code>  工具功能可以使用 <code class="docutils literal"><span class="pre">GDALVectorTranslate</span></code> 函数实现，具体定义如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">* @param pszDest      输出路径,或者NULL</span>
+<span class="cm">* @param hDstDS       输出数据集或为NULL(前两参数必须选一)</span>
+<span class="cm">* @param nSrcCount    输入数据集个数(至2.1.1为止,只能有1个)</span>
+<span class="cm">* @param pahSrcDS     输入数据集列表</span>
+<span class="cm">* @param psOptionsIn  命令行参数</span>
+<span class="cm">* @param pbUsageError 返回值,标识错误信息</span>
+<span class="cm">* @return  输出数据集(如果hDstDS为NULL,返回的数据集必须使用GDALClose关闭)</span>
+<span class="cm">*/</span>
+<span class="n">GDALDatasetH</span> <span class="n">GDALVectorTranslate</span>    <span class="p">(</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>    <span class="n">pszDest</span><span class="p">,</span>
+    <span class="n">GDALDatasetH</span>    <span class="n">hDstDS</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nSrcCount</span><span class="p">,</span>
+    <span class="n">GDALDatasetH</span> <span class="o">*</span>  <span class="n">pahSrcDS</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">GDALVectorTranslateOptions</span> <span class="o">*</span>      <span class="n">psOptionsIn</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="o">*</span>   <span class="n">pbUsageError</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>基本使用方式如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="c1">//添加命令参数,每次添加一个!!!</span>
+<span class="kt">char</span> <span class="o">**</span><span class="n">argv</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;-f&quot;</span> <span class="p">);</span>
+<span class="n">argv</span> <span class="o">=</span> <span class="n">CSLAddString</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;GML&quot;</span> <span class="p">);</span>
+
+<span class="c1">//错误实例!!!!</span>
+<span class="c1">//error!!!!</span>
+<span class="c1">//////argv = CSLAddString( argv, &quot;-f GML&quot; );//此写法错误,按照上面写!!!!</span>
+<span class="c1">//error!!!!</span>
+
+<span class="c1">//返回</span>
+<span class="kt">int</span> <span class="n">bUsageError</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+<span class="c1">//输入列表</span>
+<span class="n">GDALDatasetH</span> <span class="n">TestDs</span> <span class="o">=</span> <span class="n">GDALOpenEx</span><span class="p">(</span><span class="s">&quot;test.shp&quot;</span><span class="p">,</span><span class="n">GDAL_OF_VECTOR</span><span class="p">,</span> <span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+<span class="c1">//gdalwarp</span>
+<span class="n">GDALVectorTranslateOptions</span> <span class="o">*</span><span class="n">opt</span> <span class="o">=</span> <span class="n">GDALVectorTranslateOptionsNew</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">dst</span> <span class="o">=</span> <span class="p">(</span> <span class="n">GDALDataset</span> <span class="o">*</span> <span class="p">)</span><span class="n">GDALVectorTranslate</span><span class="p">(</span> <span class="s">&quot;out.gml&quot;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="o">&amp;</span><span class="n">TestDs</span> <span class="p">,</span><span class="n">opt</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bUsageError</span> <span class="p">);</span>
+<span class="n">GDALVectorTranslateOptionsFree</span><span class="p">(</span> <span class="n">opt</span> <span class="p">);</span>
+<span class="n">CSLDestroy</span><span class="p">(</span> <span class="n">argv</span> <span class="p">);</span>
+<span class="c1">//do something</span>
+<span class="c1">//clear env</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">dst</span><span class="p">);</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">TestDs</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gdal-alg.html" class="btn btn-neutral float-right" title="GDAL算法简介" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="gdal-utilities.html" class="btn btn-neutral" title="GDAL工具集" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2013-2018, wuqi.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

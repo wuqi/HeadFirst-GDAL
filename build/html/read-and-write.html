@@ -1,0 +1,983 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>栅格数据读写 &mdash; headfirst gdal 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="headfirst gdal 0.1 documentation" href="index.html"/>
+        <link rel="next" title="GDAL工具集" href="gdal-utilities.html"/>
+        <link rel="prev" title="GDAL数据模型" href="gdal-data-model.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> headfirst gdal
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preface.html">前言</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">影像是什么</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-data-model.html">GDAL数据模型</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">栅格数据读写</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gdaldriver">GdalDriver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gdalread">数据读取</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">打开数据集</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">打开波段</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">读取内容</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">关闭数据集</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#write">数据写入</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id9">获取驱动</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#createdataset">创建数据集</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id11">从已读入的数据集中创建</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id12">直接创建</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id15">写入数据</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id16">关闭数据集</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id17">分块读写</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#gdal2-0">GDAL2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fullcode">完整代码</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zipandweb">压缩文件与网络文件读取</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id20">压缩文件</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id21">网络文件</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#other">其他处理</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-utilities.html">GDAL工具集</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-tool-code.html">GDAL工具集代码实现(C/C++)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-cheat-sheet.html">GDAL Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-warp-api-tutorial.html">GDALWarp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="static-build.html">静态编译</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-architecture.html">OGR矢量结构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-proj.html">OGR投影简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-read-write.html">矢量数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-sql.html">OGR SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sqlite-sql.html">SQLite SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-utilities.html">OGR工具集</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">headfirst gdal</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>栅格数据读写</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/read-and-write.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="read-write">
+<span id="id1"></span><h1>栅格数据读写<a class="headerlink" href="#read-write" title="Permalink to this headline">¶</a></h1>
+<p>本章我们就开始按顺序详细介绍GDAL读写栅格数据的过程。最后将提供完整的读写流程代码。 <a class="reference internal" href="#fullcode"><span class="std std-ref">完整代码</span></a> 中有整个创建、两影像相加、写入的流程，如果已经大致了解GDAL的读写流程，可以直接参照 <a class="reference internal" href="#fullcode"><span class="std std-ref">完整代码</span></a> 。</p>
+<div class="section" id="gdaldriver">
+<span id="id2"></span><h2>GdalDriver<a class="headerlink" href="#gdaldriver" title="Permalink to this headline">¶</a></h2>
+<p>首先，GDAL对每种格式提供了一个驱动 <code class="docutils literal"><span class="pre">GdalDriver</span></code> ， <code class="docutils literal"><span class="pre">GdalDriver</span></code> 将对对应格式的数据进行管理，例如读取、创建、删除、重命名、复制、从已有数据创建新数据集等。所以，我们所有程序开头，都将添加 <code class="docutils literal"><span class="pre">GDALAllRegister()</span></code> 函数，注册所有GDAL支持的数据驱动。</p>
+<p><strong>再次强调，所有的程序都要首先调用GDALAllRegister() 函数</strong> ，否则将无法打开任何数据。</p>
+</div>
+<div class="section" id="gdalread">
+<span id="id3"></span><h2>数据读取<a class="headerlink" href="#gdalread" title="Permalink to this headline">¶</a></h2>
+<p>GDAL中数据读取的步骤如下：</p>
+<ul class="simple">
+<li>打开数据集</li>
+<li>打开数据集下所需的波段</li>
+<li>读取数据</li>
+</ul>
+<p>下面分步讲解如何操作：</p>
+<div class="section" id="id4">
+<h3>打开数据集<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>打开 <a class="reference internal" href="formats.html#multibands"><span class="std std-ref">多波段数据</span></a> 步骤如下：使用 <code class="docutils literal"><span class="pre">GDALOpen</span></code> 或者 <code class="docutils literal"><span class="pre">GDALOpenShared</span></code> 函数，传入文件名，打开数据集。 <code class="docutils literal"><span class="pre">GDALOpen</span></code> 和 <code class="docutils literal"><span class="pre">GDALOpenShared</span></code> 参数一样，区别在于，在同一线程，如果是相同的文件，多个 <code class="docutils literal"><span class="pre">GDALOpenShared</span></code> 打开的其实是同一个 <code class="docutils literal"><span class="pre">GDALDataset</span></code> 的引用（如果在不同线程使用，为了保证线程安全，返回的将是不同的对象）。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;gdal_priv.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;cpl_conv.h&quot;</span><span class="cp"></span>
+
+<span class="c1">//...中间的程序</span>
+
+<span class="c1">//所有程序前先加上</span>
+<span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="c1">//pszFilename代表文件名，GA_ReadOnly表示以只读方式打开</span>
+<span class="c1">//也可以使用GA_Update</span>
+<span class="c1">//GDALOpenShared和GDALOpen可以互换</span>
+<span class="n">GDALDataset</span>  <span class="o">*</span><span class="n">poDataset</span><span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span> <span class="n">pszFilename</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span>
+<span class="k">if</span><span class="p">(</span> <span class="n">poDataset</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">...;</span><span class="c1">//打开失败处理</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>打开 <a class="reference internal" href="formats.html#multidatasets"><span class="std std-ref">多数据集数据</span></a> 方式与上面稍有区别，因为有多个子数据集，所以需要获取真实数据的话，实际上是获取子数据集中的波段，可以使用 <a class="reference internal" href="gdal-utilities.html#gdalinfo"><span class="std std-ref">gdalinfo文件信息工具</span></a> 获取如下的 <a class="reference internal" href="gdal-data-model.html#subdatasetsdomain"><span class="std std-ref">子数据集域</span></a></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>Subdatasets:
+    SUBDATASET_1_NAME=NETCDF:&quot;example.nc&quot;:auditTrail
+    SUBDATASET_1_DESC=[2x80] auditTrail (8-bit character)
+    SUBDATASET_2_NAME=NETCDF:&quot;example.nc&quot;:data
+    SUBDATASET_2_DESC=[1x61x172] data (32-bit floating-point)
+    SUBDATASET_3_NAME=NETCDF:&quot;example.nc&quot;:lat
+    SUBDATASET_3_DESC=[61x172] lat (32-bit floating-point)
+    SUBDATASET_4_NAME=NETCDF:&quot;example.nc&quot;:lon
+    SUBDATASET_4_DESC=[61x172] lon (32-bit floating-point)
+</pre></div>
+</div>
+<p>打开子数据集也使用 <code class="docutils literal"><span class="pre">GDALOpen</span></code> 或者 <code class="docutils literal"><span class="pre">GDALOpenShared</span></code> 函数，但是传入的不是整个数据集的名称，而是需要打开的 <code class="docutils literal"><span class="pre">SUBDATASET_N_NAME=</span></code> (_N_中N为第几个子数据集，即 <code class="docutils literal"><span class="pre">1</span> <span class="pre">2</span> <span class="pre">3</span> <span class="pre">4...</span></code>)后面的字符串，即子数据集名称。例如需要打开上例中data子数据集，使用如下代码：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;gdal_priv.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;cpl_conv.h&quot;</span><span class="cp"></span>
+
+<span class="c1">//...中间的程序</span>
+
+<span class="c1">//所有程序前先加上</span>
+<span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="c1">//也可以使用GA_Update</span>
+<span class="c1">//GDALOpenShared和GDALOpen可以互换</span>
+<span class="c1">//pszFilename代表子数据集的NAME，注意双引号需要转义，GA_ReadOnly表示以只读方式打开</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">pszFilename</span> <span class="o">=</span> <span class="s">&quot;NETCDF:</span><span class="se">\&quot;</span><span class="s">example.nc</span><span class="se">\&quot;</span><span class="s">:data&quot;</span><span class="p">;</span>
+<span class="n">GDALDataset</span>  <span class="o">*</span><span class="n">poDataset</span><span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span> <span class="n">pszFilename</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span>
+<span class="k">if</span><span class="p">(</span> <span class="n">poDataset</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">...;</span><span class="c1">//打开失败处理</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>打开了数据集后，两种数据接下来的处理方式都是一样的。</p>
+</div>
+<div class="section" id="id5">
+<h3>打开波段<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>GDAL中， <strong>波段起始索引为1</strong> ，所以循环时需要特别注意。使用 <code class="docutils literal"><span class="pre">GDALDataset-&gt;GetRasterBand(int</span> <span class="pre">BandIndex)</span></code> 函数，可以打开波段。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;gdal_priv.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;cpl_conv.h&quot;</span><span class="cp"></span>
+<span class="c1">//...中间的程序</span>
+
+<span class="c1">//所有程序前先加上</span>
+<span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="n">GDALDataset</span>  <span class="o">*</span><span class="n">poDataset</span><span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span> <span class="n">pszFilename</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span><span class="c1">//打开文件</span>
+<span class="k">if</span><span class="p">(</span> <span class="n">poDataset</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//...//打开失败处理</span>
+<span class="p">}</span>
+<span class="c1">//打开数据集同上</span>
+<span class="c1">//获取影像相关信息</span>
+<span class="kt">int</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">,</span><span class="n">bandNum</span><span class="p">;</span>
+<span class="n">width</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterXSize</span><span class="p">();</span><span class="c1">//影像宽度</span>
+<span class="n">height</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterYSize</span><span class="p">();</span><span class="c1">//影像高度</span>
+<span class="n">bandNum</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterCount</span><span class="p">();</span><span class="c1">//影像波段数量</span>
+
+<span class="c1">//将第一波段读入</span>
+<span class="kt">double</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="n">width</span><span class="o">*</span><span class="n">height</span><span class="p">];</span>
+<span class="n">GDALRasterBand</span> <span class="o">*</span><span class="n">band</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="c1">//获取第一波段，波段从1开始</span>
+<span class="c1">//如果是在循环内，需要注意，波段从1开始；</span>
+<span class="c1">//for(i=0;i &lt; bandNum;i++){</span>
+<span class="c1">// GDALRasterBand *band = ds1-&gt;GetRasterBand(i+1);//这里注意下</span>
+<span class="c1">// ......对波段处理</span>
+<span class="c1">//}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h3>读取内容<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>使用 <code class="docutils literal"><span class="pre">RasterIO</span></code> 函数获取波段中的具体内容，该函数的功能强大，参数较多,我们先用代码演示,然后用图来表示。</p>
+<p>函数说明：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">///CPLErr GDALRasterBand::RasterIO (</span>
+<span class="c1">///@param eRWFlag,     //读取或者写入,GF_Read或GF_Write</span>
+<span class="c1">///@param nXOff,       //起始点x坐标</span>
+<span class="c1">///@param nYOff,       //起始点y坐标</span>
+<span class="c1">///@param nXSize,      //所需读取(写入)块宽度</span>
+<span class="c1">///@param nYSize,      //所读(写)块高度</span>
+<span class="c1">///@param * pData,     //所读(写)数据,指针,</span>
+<span class="c1">///@param nBufXSize,   //一般跟nXSize一致，用于缩放图像，</span>
+<span class="c1">///                      图像将按nBufXSize/nXsize在x尺度缩放（会自动重采样）</span>
+<span class="c1">///                     ，一般不需要调整</span>
+<span class="c1">///@param nBufYSize,   //一般跟nYSize一致</span>
+<span class="c1">///@param eBufType,    //与pData的实际类型一致,GDT_Float64</span>
+<span class="c1">///                      代表double,其他的可以跳到定义查看</span>
+<span class="c1">///@param nPixelSpace,</span>
+<span class="c1">///                      设置为0为自动判断，一般设为0</span>
+<span class="c1">///                      表示的是当前像素值和下一个像素值之间的间隔，单位是字节</span>
+<span class="c1">///                      例:byte类型，就是1，double类型，就是8</span>
+<span class="c1">///@param nLineSpace</span>
+<span class="c1">///                      设置为0为自动判断，一般设为0</span>
+<span class="c1">///                      表示的是当前行和下一行的间隔，，单位是字节</span>
+<span class="c1">///                      例如，一行300像素，类型为int,此时就是300*4 = 1200</span>
+<span class="c1">///@return             //是否成功,成功返回CE_None ,失败返回 CE_Failure</span>
+<span class="n">CPLErr</span> <span class="n">GDALRasterBand</span><span class="o">::</span><span class="n">RasterIO</span> <span class="p">(</span>
+    <span class="n">GDALRWFlag</span> <span class="n">eRWFlag</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nXOff</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nYOff</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nXSize</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nYSize</span><span class="p">,</span>
+    <span class="kt">void</span> <span class="o">*</span> <span class="n">pData</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nBufXSize</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nBufYSize</span><span class="p">,</span>
+    <span class="n">GDALDataType</span>    <span class="n">eBufType</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nPixelSpace</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nLineSpace</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>示意图：</p>
+<div class="figure align-center">
+<img alt="multiBands Image" src="_images/RasterIO.png" />
+</div>
+<p>读取单幅影像第一波段原始数据代码示例：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;gdal_priv.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;cpl_conv.h&quot;</span><span class="cp"></span>
+<span class="c1">//...中间的程序</span>
+
+<span class="c1">//所有程序前先加上</span>
+<span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="n">GDALDataset</span>  <span class="o">*</span><span class="n">poDataset</span><span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span> <span class="n">pszFilename</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span><span class="c1">//打开文件</span>
+<span class="k">if</span><span class="p">(</span> <span class="n">poDataset</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//...打开失败处理</span>
+<span class="p">}</span>
+<span class="c1">//打开数据集同上</span>
+<span class="c1">//获取影像相关信息</span>
+<span class="kt">int</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">,</span><span class="n">bandNum</span><span class="p">;</span>
+<span class="n">width</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterXSize</span><span class="p">();</span><span class="c1">//影像宽度</span>
+<span class="n">height</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterYSize</span><span class="p">();</span><span class="c1">//影像高度</span>
+<span class="n">bandNum</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterCount</span><span class="p">();</span><span class="c1">//影像波段数量</span>
+
+<span class="c1">//将第一波段读入</span>
+<span class="kt">double</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="n">width</span><span class="o">*</span><span class="n">height</span><span class="p">];</span>
+<span class="n">GDALRasterBand</span> <span class="o">*</span><span class="n">band</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="c1">//获取第一波段，波段从1开始</span>
+<span class="n">band</span><span class="o">-&gt;</span><span class="n">RasterIO</span><span class="p">(</span><span class="n">GF_Read</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">,</span><span class="n">GDT_Float64</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>使用RasterIO函数时需要注意以下几点：</p>
+<ul class="last simple">
+<li>波段索引从一开始计算</li>
+<li>pData数组要有足够的大小</li>
+<li>pData数组数据类型要和eBufType对应</li>
+<li>读取完成后必须要释放数组和关闭数据集，波段不需要关闭</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>关闭数据集<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>程序结束前，必须要关闭数据集，使用 <code class="docutils literal"><span class="pre">GDALClose()</span></code> 函数。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALClose</span><span class="p">(</span><span class="n">ds2</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="write">
+<span id="id8"></span><h2>数据写入<a class="headerlink" href="#write" title="Permalink to this headline">¶</a></h2>
+<p>数据写入分为几个步骤</p>
+<ul class="simple">
+<li>获取驱动</li>
+<li>创建数据集</li>
+<li>写入数据</li>
+<li>关闭数据集</li>
+</ul>
+<div class="section" id="id9">
+<h3>获取驱动<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="#gdaldriver"><span class="std std-ref">GdalDriver</span></a> 中已经说明，不论读取还是写入， <code class="docutils literal"><span class="pre">GDALDriver</span></code> 都是很重要的存在。如果需要输出特定格式，我们必须首先获取该格式的驱动，才能创建该格式的数据集。获取方式如下：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALDriver</span> <span class="o">*</span><span class="n">poDriver</span><span class="p">;</span>
+
+<span class="c1">//一般使用tif作为输出，如果有特殊需求，请参阅gdal文档，一般修改这里改为其他驱动名称即可，例如PNG</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pszFormat</span> <span class="o">=</span><span class="s">&quot;GTiff&quot;</span><span class="p">;</span>
+<span class="n">poDriver</span> <span class="o">=</span> <span class="n">GetGDALDriverManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="n">pszFormat</span><span class="p">);</span><span class="c1">//获取特殊的驱动。</span>
+<span class="k">if</span><span class="p">(</span><span class="n">poDriver</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="createdataset">
+<span id="id10"></span><h3>创建数据集<a class="headerlink" href="#createdataset" title="Permalink to this headline">¶</a></h3>
+<p>根据不同输出需要，创建数据集有两种方式：</p>
+<ul class="simple">
+<li>输出的影像与输入的影像大小、投影都相同，只有数据不同，就可以从已经读入的数据集中创建</li>
+<li>投影或大小不同，需要创建新的数据集</li>
+</ul>
+<p>下面分别说明两种方式如何创建数据集，下文都是以输出GeoTiff作为示例，不同的 <code class="docutils literal"><span class="pre">GdalDriver</span></code> 中，可以设置的参数不同，具体请参考 <a class="reference external" href="http://www.gdal.org/formats_list.html">GDAL支持格式</a> 中对每种格式的说明。</p>
+<div class="section" id="id11">
+<h4>从已读入的数据集中创建<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<p>从已经读入的数据集中创建数据集，可以使用 <code class="docutils literal"><span class="pre">GDALDriver</span></code> 的 <code class="docutils literal"><span class="pre">CreateCopy</span></code> 函数。</p>
+<p><code class="docutils literal"><span class="pre">CreateCopy</span></code> 函数原型如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//从已有的dataset中创建</span>
+<span class="c1">//@param pszFilename, 输出文件名</span>
+<span class="c1">//@param poSrcDS, 已有的dataset</span>
+<span class="c1">//@param bStrict, TRUE表示严格等价，一般设置为FALSE，表示拷贝副本用作编辑</span>
+<span class="c1">//@param papszOptions, 参数设置，具体可以参考每个driver的文档</span>
+<span class="c1">//@param  pfnProgress 回调函数指针</span>
+<span class="c1">//@param *pProgressData 传入回调函数的数据</span>
+<span class="n">GDALDataset</span> <span class="o">*</span> <span class="n">GDALDriver</span><span class="o">::</span><span class="n">CreateCopy</span>     <span class="p">(</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="n">pszFilename</span><span class="p">,</span>
+    <span class="n">GDALDataset</span> <span class="o">*</span>     <span class="n">poSrcDS</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">bStrict</span><span class="p">,</span>
+    <span class="kt">char</span> <span class="o">**</span>     <span class="n">papszOptions</span><span class="p">,</span>
+    <span class="n">GDALProgressFunc</span>     <span class="n">pfnProgress</span><span class="p">,</span>
+    <span class="kt">void</span> <span class="o">*</span>     <span class="n">pProgressData</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>使用 <code class="docutils literal"><span class="pre">CreateCopy</span></code> 函数创建数据集代码如下：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALDataset</span> <span class="o">*</span><span class="n">OutDs</span><span class="p">;</span>
+<span class="kt">char</span> <span class="o">**</span><span class="n">papszOptions</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span><span class="c1">//设置压缩、存储方式等，每种格式不同，可以直接设置为NULL</span>
+                           <span class="c1">//也可以根据需要设置,例如：</span>
+<span class="c1">//papszOptions = CSLSetNameValue( papszOptions, &quot;TILED&quot;, &quot;YES&quot; );</span>
+<span class="c1">//papszOptions = CSLSetNameValue( papszOptions, &quot;COMPRESS&quot;, &quot;PACKBITS&quot; );</span>
+
+<span class="c1">//创建与ds1相同的坐标信息、相同大小的文件</span>
+<span class="n">OutDs</span> <span class="o">=</span> <span class="n">poDriver</span><span class="o">-&gt;</span><span class="n">CreateCopy</span><span class="p">(</span><span class="n">OutPut1</span><span class="p">,</span><span class="n">ds1</span><span class="p">,</span><span class="n">FALSE</span><span class="p">,</span><span class="n">papszOptions</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h4>直接创建<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<p>直接创建数据集比从已有数据集中创建会多出创建投影的步骤：</p>
+<div class="section" id="id13">
+<h5>创建数据集<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h5>
+<p>直接集中创建数据集，可以使用 <code class="docutils literal"><span class="pre">GDALDriver</span></code> 的 <code class="docutils literal"><span class="pre">Create</span></code> 函数。</p>
+<p><code class="docutils literal"><span class="pre">Create</span></code> 函数原型如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//Create文件</span>
+<span class="c1">//@param pszFilename, 输出文件名</span>
+<span class="c1">//@param nXSize, 文件宽度</span>
+<span class="c1">//@param nYSize, 文件高度</span>
+<span class="c1">//@param nBands, 波段数</span>
+<span class="c1">//@param eType, 数据类型</span>
+<span class="c1">//@param papszOptions     参数设置，具体可以设置的属性参考每个driver的文档</span>
+<span class="c1">//@return dataset</span>
+<span class="n">GDALDataset</span> <span class="o">*</span> <span class="n">GDALDriver</span><span class="o">::</span><span class="n">Create</span> <span class="p">(</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="n">pszFilename</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nXSize</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nYSize</span><span class="p">,</span>
+    <span class="kt">int</span>     <span class="n">nBands</span><span class="p">,</span>
+    <span class="n">GDALDataType</span>     <span class="n">eType</span><span class="p">,</span>
+    <span class="kt">char</span> <span class="o">**</span>     <span class="n">papszOptions</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>使用 <code class="docutils literal"><span class="pre">Create</span></code> 函数创建数据集代码如下：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALDataset</span> <span class="o">*</span><span class="n">OutDs</span><span class="p">;</span>
+<span class="c1">///设置：</span>
+<span class="kt">char</span> <span class="o">**</span><span class="n">papszOptions</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">papszOptions</span> <span class="o">=</span> <span class="n">CSLSetNameValue</span><span class="p">(</span> <span class="n">papszOptions</span><span class="p">,</span> <span class="s">&quot;TILED&quot;</span><span class="p">,</span> <span class="s">&quot;YES&quot;</span> <span class="p">);</span>
+<span class="n">papszOptions</span> <span class="o">=</span> <span class="n">CSLSetNameValue</span><span class="p">(</span> <span class="n">papszOptions</span><span class="p">,</span> <span class="s">&quot;COMPRESS&quot;</span><span class="p">,</span> <span class="s">&quot;PACKBITS&quot;</span> <span class="p">);</span>
+<span class="c1">///...</span>
+<span class="c1">///创建512*512，单波段的，byte类型的数据</span>
+<span class="n">OutDs</span> <span class="o">=</span> <span class="n">poDriver</span><span class="o">-&gt;</span><span class="n">Create</span><span class="p">(</span> <span class="n">pszDstFilename</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">GDT_Byte</span><span class="p">,</span>
+                            <span class="n">papszOptions</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id14">
+<h5>创建投影<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h5>
+<p>在 <a class="reference internal" href="gdal-data-model.html#coordinatesystem"><span class="std std-ref">投影系统</span></a> 和 <a class="reference internal" href="gdal-data-model.html#affinegeotransform"><span class="std std-ref">仿射地理变换</span></a> 中已经介绍过GDAL中数据如何投影，下面我们将用代码示例：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">///设置仿射变换参数</span>
+<span class="kt">double</span> <span class="n">adfGeoTransform</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">444720</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3751320</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">30</span> <span class="p">};</span>
+<span class="n">OutDs</span><span class="o">-&gt;</span><span class="n">SetGeoTransform</span><span class="p">(</span> <span class="n">adfGeoTransform</span> <span class="p">);</span>
+
+<span class="c1">//设置投影</span>
+<span class="n">OGRSpatialReference</span> <span class="n">oSRS</span><span class="p">;</span>
+<span class="kt">char</span> <span class="o">*</span><span class="n">pszSRS_WKT</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">oSRS</span><span class="p">.</span><span class="n">SetUTM</span><span class="p">(</span> <span class="mi">11</span><span class="p">,</span> <span class="n">TRUE</span> <span class="p">);</span>
+<span class="n">oSRS</span><span class="p">.</span><span class="n">SetWellKnownGeogCS</span><span class="p">(</span> <span class="s">&quot;NAD27&quot;</span> <span class="p">);</span>
+<span class="n">oSRS</span><span class="p">.</span><span class="n">exportToWkt</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">pszSRS_WKT</span> <span class="p">);</span>
+<span class="n">poDstDS</span><span class="o">-&gt;</span><span class="n">SetProjection</span><span class="p">(</span> <span class="n">pszSRS_WKT</span> <span class="p">);</span>
+<span class="n">CPLFree</span><span class="p">(</span> <span class="n">pszSRS_WKT</span> <span class="p">);</span><span class="c1">//使用完后释放</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id15">
+<h3>写入数据<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>写入数据与读取数据基本相同，都是使用 <code class="docutils literal"><span class="pre">GDALRasterBand</span></code> 的 <code class="docutils literal"><span class="pre">RasterIO</span></code> 函数，只是第一个参数变为 <code class="docutils literal"><span class="pre">GF_Write</span></code> ，下面就直接给出代码，不再另作说明。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="o">*</span> <span class="n">outData</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">float</span> <span class="p">[</span><span class="mi">512</span><span class="o">*</span><span class="mi">512</span><span class="p">];</span>
+
+<span class="c1">//对outData进行计算、处理</span>
+<span class="cm">/************************************************************************/</span>
+<span class="cm">/*********************************处理************************************/</span>
+<span class="cm">/************************************************************************/</span>
+
+<span class="n">GDALRasterBand</span> <span class="o">*</span><span class="n">outBand</span> <span class="o">=</span> <span class="n">OutDs</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">outBand</span><span class="o">-&gt;</span><span class="n">RasterIO</span><span class="p">(</span><span class="n">GF_Write</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">512</span><span class="p">,</span><span class="mi">512</span><span class="p">,</span><span class="n">outData</span><span class="p">,</span><span class="mi">512</span><span class="p">,</span><span class="mi">512</span><span class="p">,</span><span class="n">GDT_Float32</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id16">
+<h3>关闭数据集<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p>数据集必须关闭后，数据才会写入到输出文件中，否则数据将在缓存中，使用 <code class="docutils literal"><span class="pre">GDALClose()</span></code> 函数关闭数据集。</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALClose</span><span class="p">(</span><span class="n">OutDs</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id17">
+<h3>分块读写<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>数据较大时,分块读写将提高效率,实际上大部分的图像格式中包含分块内容,一般是以行分块为主,所以块宽度为行宽可能会提高分块读取速度</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span><span class="c1">//注册类型，打开影像必须加入此句</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">ds1</span><span class="p">;</span>
+<span class="n">ds1</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span><span class="n">input1</span><span class="p">,</span><span class="n">GA_ReadOnly</span><span class="p">);</span><span class="c1">//input1为文件名</span>
+<span class="k">if</span><span class="p">(</span><span class="n">ds1</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>  <span class="c1">//读取失败</span>
+    <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&quot;cant open the unReferard image!&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">WidthAll</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterXSize</span><span class="p">();</span> <span class="c1">//影像宽度</span>
+<span class="n">HeightAll</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterYSize</span><span class="p">();</span><span class="c1">//影像高度</span>
+<span class="n">BandNum</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterCount</span><span class="p">();</span><span class="c1">//影像波段数</span>
+<span class="c1">//读取波段数据</span>
+<span class="n">GDALRasterBand</span> <span class="o">*</span><span class="n">poBand</span><span class="p">;</span><span class="c1">//不需要释放,只需要最后是否GDALDataset</span>
+<span class="kt">double</span> <span class="o">**</span><span class="n">Inputimg1</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">double</span><span class="o">*</span><span class="p">[</span><span class="n">BandNum</span><span class="p">];</span>
+
+<span class="kt">int</span> <span class="n">blockx</span> <span class="o">=</span> <span class="mi">512</span><span class="p">;</span><span class="c1">//分块大小</span>
+<span class="kt">int</span> <span class="n">blocky</span> <span class="o">=</span> <span class="mi">512</span><span class="p">;</span>
+<span class="c1">//分块处理.将影像分成很多blockx*blocky大小的块，通过循环对每一块进行处理</span>
+<span class="kt">int</span> <span class="n">nxNum</span> <span class="o">=</span> <span class="n">WidthAll</span><span class="o">/</span><span class="n">blockx</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span><span class="c1">//计算列方向上块数</span>
+<span class="kt">int</span> <span class="n">nyNum</span> <span class="o">=</span> <span class="n">HeightAll</span><span class="o">/</span><span class="n">blocky</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span><span class="c1">//计算行方向块数</span>
+
+<span class="kt">int</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">Width</span><span class="p">,</span><span class="n">Height</span><span class="p">;</span><span class="c1">//块的实际宽和高</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nxNum</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">nyNum</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">//确定实际块大小</span>
+        <span class="n">Width</span> <span class="o">=</span> <span class="p">(</span><span class="n">WidthAll</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">blockx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">?</span> <span class="nl">blockx</span> <span class="p">:</span> <span class="p">(</span><span class="n">WidthAll</span> <span class="o">-</span> <span class="n">i</span> <span class="o">*</span> <span class="n">blockx</span><span class="p">);</span>
+        <span class="n">Height</span> <span class="o">=</span> <span class="p">(</span><span class="n">HeightAll</span> <span class="o">-</span> <span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">blocky</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">?</span> <span class="nl">blocky</span> <span class="p">:</span> <span class="p">(</span><span class="n">HeightAll</span> <span class="o">-</span> <span class="n">j</span> <span class="o">*</span> <span class="n">blocky</span><span class="p">);</span>
+        <span class="c1">//分块读取数据</span>
+        <span class="k">for</span> <span class="p">(</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">BandNum</span><span class="p">;</span> <span class="o">++</span><span class="n">k</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Inputimg1</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="n">Width</span><span class="o">*</span><span class="n">Height</span><span class="p">];</span>
+            <span class="c1">//注意,获取波段数从1开始计数!!</span>
+            <span class="n">poBand</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+            <span class="c1">//将数据写入Inputimg1[j],RasterIOd中，参数具体含义见RasterIO：</span>
+            <span class="n">poBand</span><span class="o">-&gt;</span><span class="n">RasterIO</span><span class="p">(</span><span class="n">GF_Read</span><span class="p">,</span><span class="n">i</span><span class="o">*</span><span class="n">blockx</span><span class="p">,</span> <span class="n">j</span><span class="o">*</span><span class="n">blocky</span><span class="p">,</span> <span class="n">Width</span><span class="p">,</span> <span class="n">Height</span><span class="p">,</span><span class="n">Inputimg1</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> \
+                             <span class="n">Width</span><span class="p">,</span><span class="n">Height</span><span class="p">,</span><span class="n">GDT_Float64</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="cm">/**</span>
+<span class="cm">        * 处理</span>
+<span class="cm">        * 处理</span>
+<span class="cm">        * 处理</span>
+<span class="cm">        */</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">//用完之后,关闭dataset即可,不需要释放GDALRasterBand</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">ds1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="gdal2-0">
+<span id="gdal2"></span><h2>GDAL2.0<a class="headerlink" href="#gdal2-0" title="Permalink to this headline">¶</a></h2>
+<p>GDAL2.0版本中,RasterIO添加了 <code class="docutils literal"><span class="pre">GDALRasterIOExtraArg</span></code> 结构体作为参数,默认为空,所有GDAL1的代码可以不用修改直接编译. <code class="docutils literal"><span class="pre">GDALRasterIOExtraArg</span></code>  中可以选择重采样方式/偏移/进度条等功能,定义和结构如下:</p>
+<dl class="class">
+<dt id="_CPPv220GDALRasterIOExtraArg">
+<span id="GDALRasterIOExtraArg"></span><em class="property">class </em><code class="descclassname"></code><code class="descname">GDALRasterIOExtraArg</code><a class="headerlink" href="#_CPPv220GDALRasterIOExtraArg" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>向RasterIO中传入额外信息</p>
+</dd></dl>
+
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/** Structure to pass extra arguments to RasterIO() method</span>
+<span class="cm">  * @since GDAL 2.0</span>
+<span class="cm">  */</span>
+<span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+    <span class="cm">/*! 版本号,方便以后扩展 */</span>
+    <span class="kt">int</span>                    <span class="n">nVersion</span><span class="p">;</span>
+    <span class="cm">/*! 重采样算法 */</span>
+    <span class="n">GDALRIOResampleAlg</span>     <span class="n">eResampleAlg</span><span class="p">;</span>
+    <span class="cm">/*! 进度条 callback 函数*/</span>
+    <span class="n">GDALProgressFunc</span>       <span class="n">pfnProgress</span><span class="p">;</span>
+    <span class="cm">/*! 进度条 callback user data */</span>
+    <span class="kt">void</span>                  <span class="o">*</span><span class="n">pProgressData</span><span class="p">;</span>
+    <span class="cm">/*! Indicate if dfXOff, dfYOff, dfXSize and dfYSize are set.</span>
+<span class="cm">        Mostly reserved from the VRT driver to communicate a more precise</span>
+<span class="cm">        source window. Must be such that dfXOff - nXOff &lt; 1.0 and</span>
+<span class="cm">        dfYOff - nYOff &lt; 1.0 and nXSize - dfXSize &lt; 1.0 and nYSize - dfYSize &lt; 1.0 */</span>
+    <span class="kt">int</span>                    <span class="n">bFloatingPointWindowValidity</span><span class="p">;</span>
+    <span class="cm">/*! 像素相对左上角点x轴偏移量,仅在bFloatingPointWindowValidity = TRUE时有效 */</span>
+    <span class="kt">double</span>                 <span class="n">dfXOff</span><span class="p">;</span>
+    <span class="cm">/*! 像素相对左上角点y轴偏移量,仅在bFloatingPointWindowValidity = TRUE时有效 */</span>
+    <span class="kt">double</span>                 <span class="n">dfYOff</span><span class="p">;</span>
+    <span class="cm">/*! 感兴趣区域的像素宽度 bFloatingPointWindowValidity = TRUE时有效 */</span>
+    <span class="kt">double</span>                 <span class="n">dfXSize</span><span class="p">;</span>
+    <span class="cm">/*! 感兴趣区域的像素高度 bFloatingPointWindowValidity = TRUE时有效 */</span>
+    <span class="kt">double</span>                 <span class="n">dfYSize</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">GDALRasterIOExtraArg</span><span class="p">;</span>
+</pre></div>
+</div>
+<dl class="enum">
+<dt id="_CPPv218GDALRIOResampleAlg">
+<em class="property">enum </em><code class="descclassname"></code><code class="descname">GDALRIOResampleAlg</code><a class="headerlink" href="#_CPPv218GDALRIOResampleAlg" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>重采样方式</p>
+</dd></dl>
+
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span>
+<span class="p">{</span>
+    <span class="cm">/*! Nearest neighbour 默认 */</span>                       <span class="n">GRIORA_NearestNeighbour</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="cm">/*! Bilinear (2x2 kernel) */</span>                        <span class="n">GRIORA_Bilinear</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="cm">/*! Cubic Convolution Approximation (4x4 kernel) */</span> <span class="n">GRIORA_Cubic</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="cm">/*! Cubic B-Spline Approximation (4x4 kernel) */</span>    <span class="n">GRIORA_CubicSpline</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="cm">/*! Lanczos windowed sinc interpolation (6x6 kernel) */</span> <span class="n">GRIORA_Lanczos</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="cm">/*! Average */</span>                                      <span class="n">GRIORA_Average</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="cm">/*! Mode (selects the value which appears most often of all the sampled points) */</span>
+                                                        <span class="n">GRIORA_Mode</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="cm">/*! Gauss blurring */</span>                               <span class="n">GRIORA_Gauss</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="cm">/* NOTE: values 8 to 12 are reserved for max,min,med,Q1,Q3 */</span>
+<span class="p">}</span> <span class="n">GDALRIOResampleAlg</span><span class="p">;</span>
+</pre></div>
+</div>
+<dl class="macro">
+<dt id="c.INIT_RASTERIO_EXTRA_ARG">
+<code class="descname">INIT_RASTERIO_EXTRA_ARG</code><a class="headerlink" href="#c.INIT_RASTERIO_EXTRA_ARG" title="Permalink to this definition">¶</a></dt>
+<dd><p>初始化GDALRasterIOExtraArg的宏</p>
+</dd></dl>
+
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#define INIT_RASTERIO_EXTRA_ARG(s)  \</span>
+<span class="cp">    do { (s).nVersion = RASTERIO_EXTRA_ARG_CURRENT_VERSION; \</span>
+<span class="cp">         (s).eResampleAlg = GRIORA_NearestNeighbour; \</span>
+<span class="cp">         (s).pfnProgress = NULL; \</span>
+<span class="cp">         (s).pProgressData = NULL; \</span>
+<span class="cp">         (s).bFloatingPointWindowValidity = FALSE; } while(0)</span>
+</pre></div>
+</div>
+<p>GDAL2.0中重采样读取完整代码如下:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;gdal_priv.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;cpl_conv.h&quot;</span><span class="cp"></span>
+<span class="c1">//...中间的程序</span>
+
+<span class="c1">//所有程序前先加上</span>
+<span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="n">GDALDataset</span>  <span class="o">*</span><span class="n">poDataset</span><span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span> <span class="n">pszFilename</span><span class="p">,</span> <span class="n">GA_ReadOnly</span> <span class="p">);</span><span class="c1">//打开文件</span>
+<span class="k">if</span><span class="p">(</span> <span class="n">poDataset</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//...打开失败处理</span>
+<span class="p">}</span>
+<span class="c1">//打开数据集同上</span>
+<span class="c1">//获取影像相关信息</span>
+<span class="kt">int</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">,</span><span class="n">bandNum</span><span class="p">;</span>
+<span class="n">width</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterXSize</span><span class="p">();</span><span class="c1">//影像宽度</span>
+<span class="n">height</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterYSize</span><span class="p">();</span><span class="c1">//影像高度</span>
+<span class="n">bandNum</span> <span class="o">=</span> <span class="n">inDS</span><span class="o">-&gt;</span><span class="n">GetRasterCount</span><span class="p">();</span><span class="c1">//影像波段数量</span>
+
+<span class="c1">//将第一波段读入</span>
+<span class="kt">double</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="n">width</span><span class="o">*</span><span class="n">height</span><span class="p">];</span>
+<span class="n">GDALRasterBand</span> <span class="o">*</span><span class="n">band</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="c1">//获取第一波段，波段从1开始</span>
+<span class="n">GDALRasterIOExtraArg</span> <span class="n">exterArg</span><span class="p">;</span>
+<span class="n">INIT_RASTERIO_EXTRA_ARG</span><span class="p">(</span><span class="n">exterArg</span><span class="p">);</span>
+<span class="n">exterArg</span><span class="p">.</span><span class="n">eResampleAlg</span> <span class="o">=</span> <span class="n">GDALRIOResampleAlg</span><span class="o">::</span><span class="n">GRIORA_Cubic</span><span class="p">;</span><span class="c1">//配置插值方法</span>
+<span class="n">band</span><span class="o">-&gt;</span><span class="n">RasterIO</span><span class="p">(</span><span class="n">GF_Read</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">,</span><span class="n">GDT_Float64</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">&amp;</span><span class="n">exterArg</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fullcode">
+<span id="id18"></span><h2>完整代码<a class="headerlink" href="#fullcode" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;gdal_priv.h&quot;</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+  <span class="n">GDALAllRegister</span><span class="p">();</span><span class="c1">//注册类型，读取写入任何类型影像必须加入此句</span>
+  <span class="c1">//以只读方式打开文件</span>
+  <span class="n">GDALDataset</span> <span class="o">*</span><span class="n">ds1</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span><span class="s">&quot;Input1.tif&quot;</span><span class="p">,</span> <span class="n">GA_ReadOnly</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">ds1</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;不能打开第一个文件，请检查文件是否存在！&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kt">int</span> <span class="n">WidthAll</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterXSize</span><span class="p">();</span>
+  <span class="kt">int</span> <span class="n">HightAll</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterYSize</span><span class="p">();</span>
+  <span class="kt">int</span> <span class="n">BandNum</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterCount</span><span class="p">();</span>
+  <span class="kt">float</span> <span class="o">**</span><span class="n">InBuf1</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">float</span><span class="o">*</span><span class="p">[</span><span class="n">BandNum</span><span class="p">];</span>
+  <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">;</span>
+
+  <span class="c1">//分波段读取</span>
+  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">BandNum</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">InBuf1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">float</span><span class="p">[</span><span class="n">WidthAll</span> <span class="o">*</span> <span class="n">HightAll</span><span class="p">];</span>
+    <span class="n">GDALRasterBand</span> <span class="o">*</span><span class="n">band</span> <span class="o">=</span> <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//获取波段，波段从1开始</span>
+    <span class="n">band</span><span class="o">-&gt;</span><span class="n">RasterIO</span><span class="p">(</span><span class="n">GF_Read</span><span class="p">,</span>
+                   <span class="mi">0</span><span class="p">,</span>
+                   <span class="mi">0</span><span class="p">,</span>
+                   <span class="n">WidthAll</span><span class="p">,</span>
+                   <span class="n">HightAll</span><span class="p">,</span>
+                   <span class="n">InBuf1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                   <span class="n">WidthAll</span><span class="p">,</span>
+                   <span class="n">HightAll</span><span class="p">,</span>
+                   <span class="n">GDT_Float32</span><span class="p">,</span>
+                   <span class="mi">0</span><span class="p">,</span>
+                   <span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">//打开第二个文件，假设第一个文件和第二个文件大小、波段数相同</span>
+  <span class="c1">//以只读方式打开文件</span>
+  <span class="n">GDALDataset</span> <span class="o">*</span><span class="n">ds2</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span><span class="s">&quot;Input2.tif&quot;</span><span class="p">,</span> <span class="n">GA_ReadOnly</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">ds2</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;不能打开第二个文件，请检查文件是否存在！&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">//第二个文件中的数据</span>
+  <span class="kt">float</span> <span class="o">**</span><span class="n">InBuf2</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">float</span><span class="o">*</span><span class="p">[</span><span class="n">BandNum</span><span class="p">];</span>
+
+  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">BandNum</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">InBuf2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">float</span><span class="p">[</span><span class="n">WidthAll</span> <span class="o">*</span> <span class="n">HightAll</span><span class="p">];</span>
+    <span class="n">GDALRasterBand</span> <span class="o">*</span><span class="n">band</span> <span class="o">=</span> <span class="n">ds2</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">band</span><span class="o">-&gt;</span><span class="n">RasterIO</span><span class="p">(</span><span class="n">GF_Read</span><span class="p">,</span>
+                   <span class="mi">0</span><span class="p">,</span>
+                   <span class="mi">0</span><span class="p">,</span>
+                   <span class="n">WidthAll</span><span class="p">,</span>
+                   <span class="n">HightAll</span><span class="p">,</span>
+                   <span class="n">InBuf2</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                   <span class="n">WidthAll</span><span class="p">,</span>
+                   <span class="n">HightAll</span><span class="p">,</span>
+                   <span class="n">GDT_Float32</span><span class="p">,</span>
+                   <span class="mi">0</span><span class="p">,</span>
+                   <span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">//写入的数据(可以最后创建写入文件,需要先创建写入数据)</span>
+  <span class="kt">float</span> <span class="o">**</span><span class="n">outBuf</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">float</span><span class="o">*</span><span class="p">[</span><span class="n">BandNum</span><span class="p">];</span>
+
+  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">BandNum</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">outBuf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">float</span><span class="p">[</span><span class="n">WidthAll</span> <span class="o">*</span> <span class="n">HightAll</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="c1">////////////////////////////////////////////////////</span>
+  <span class="c1">/////////////////////处理///////////////////////////</span>
+  <span class="c1">////////////////////////////////////////////////////</span>
+  <span class="c1">//简单相加示例，实际上，这部分最好写入函数，或者类中单独封装起来，方便使用</span>
+  <span class="k">for</span><span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">BandNum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">WidthAll</span> <span class="o">*</span> <span class="n">HightAll</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">outBuf</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">InBuf1</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">InBuf2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">];</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="c1">////////////////////////////////////////////////////</span>
+  <span class="c1">/////////////////////处理///////////////////////////</span>
+  <span class="c1">////////////////////////////////////////////////////</span>
+  <span class="c1">//创建写入图像：</span>
+  <span class="n">GDALDriver</span> <span class="o">*</span><span class="n">poDriver</span><span class="p">;</span>
+  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pszFormat</span> <span class="o">=</span> <span class="s">&quot;GTiff&quot;</span><span class="p">;</span>
+  <span class="n">poDriver</span> <span class="o">=</span> <span class="n">GetGDALDriverManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="n">pszFormat</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">poDriver</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">GDALDataset</span> <span class="o">*</span><span class="n">OutDs</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">**</span><span class="n">papszOptions</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">**</span><span class="n">papszMetadata</span><span class="p">;</span>
+  <span class="c1">//这里的参数全是指tif格式的参数，如果是其他格式，请把这里所有注释掉，或者参照文档，自行设定</span>
+  <span class="c1">//设置压缩类型，envi只认得packbits压缩.</span>
+  <span class="c1">//papszOptions = CSLSetNameValue( papszOptions, &quot;COMPRESS&quot;, &quot;PACKBITS&quot; );</span>
+  <span class="c1">//设置压缩比,可以不用,有些时候压缩反而更大,因为是无损的,除非图片很大</span>
+  <span class="c1">//papszOptions = CSLSetNameValue( papszOptions, &quot;ZLEVEL&quot;, &quot;9&quot; );</span>
+  <span class="c1">//设置bsq或者BIP存储 bsq:BAND,bip:PIXEL</span>
+  <span class="n">papszOptions</span> <span class="o">=</span> <span class="n">CSLSetNameValue</span><span class="p">(</span><span class="n">papszOptions</span><span class="p">,</span> <span class="s">&quot;INTERLEAVE&quot;</span><span class="p">,</span> <span class="s">&quot;BAND&quot;</span><span class="p">);</span>
+  <span class="n">OutDs</span> <span class="o">=</span> <span class="n">poDriver</span><span class="o">-&gt;</span><span class="n">Create</span><span class="p">(</span><span class="s">&quot;output.tif&quot;</span><span class="p">,</span>
+                           <span class="n">WidthAll</span><span class="p">,</span>
+                           <span class="n">HightAll</span><span class="p">,</span>
+                           <span class="n">BandNum</span><span class="p">,</span>
+                           <span class="n">GDT_Float32</span><span class="p">,</span>
+                           <span class="n">papszOptions</span><span class="p">);</span>
+  <span class="kt">double</span> <span class="n">geos</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span>
+  <span class="c1">//获取第一幅图的地理变化信息，这里如果与原图不同，请自己计算</span>
+  <span class="n">ds1</span><span class="o">-&gt;</span><span class="n">GetGeoTransform</span><span class="p">(</span><span class="n">geos</span><span class="p">);</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">pszProjection</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">pszPrettyWkt</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="c1">//设置为第一幅图的投影，如果与原图不同，请跳过这个if部分，到下个部分直接设置投影</span>
+  <span class="c1">//设置投影，如果需要特殊投影，请找到wkt串，自行建立投影后传入</span>
+  <span class="n">OGRSpatialReferenceH</span>  <span class="n">hSRS</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">GDALGetProjectionRef</span><span class="p">(</span><span class="n">ds1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pszProjection</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALGetProjectionRef</span><span class="p">(</span><span class="n">ds1</span><span class="p">);</span>
+    <span class="n">hSRS</span> <span class="o">=</span> <span class="n">OSRNewSpatialReference</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">OSRImportFromWkt</span><span class="p">(</span><span class="n">hSRS</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pszProjection</span><span class="p">)</span> <span class="o">==</span> <span class="n">CE_None</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">OSRExportToPrettyWkt</span><span class="p">(</span><span class="n">hSRS</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pszPrettyWkt</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">);</span>
+      <span class="n">OutDs</span><span class="o">-&gt;</span><span class="n">SetProjection</span><span class="p">(</span><span class="n">pszPrettyWkt</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="c1">//pszPrettyWkt实际上是ogc wkt串或者是proj4</span>
+  <span class="c1">//如果指定投影的，可以在http://spatialreference.org/ 网站中搜索</span>
+  <span class="c1">//找到所需要的投影后，例如西安80  3度带，中央经线117E，就是EPSG:2384，点开后</span>
+  <span class="c1">//点击ogc wkt或者proj4，抄下来就行,proj4比较短，而且没有双引号不需要转义，比较简单</span>
+  <span class="c1">//pszPrettyWkt = &quot;+proj=tmerc +lat_0=0 +lon_0=117 +k=1 +x_0=500000</span>
+  <span class="c1">//                +y_0=0 +a=6378140 +b=6356755.288157528 +units=m +no_defs&quot;;</span>
+  <span class="c1">//OutDs-&gt;SetProjection(pszPrettyWkt);</span>
+  <span class="c1">//设置坐标</span>
+  <span class="n">OutDs</span><span class="o">-&gt;</span><span class="n">SetGeoTransform</span><span class="p">(</span><span class="n">geos</span><span class="p">);</span>
+  <span class="n">CPLFree</span><span class="p">(</span><span class="n">pszPrettyWkt</span><span class="p">);</span>
+
+  <span class="c1">//写入数据到outds中</span>
+  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">BandNum</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">GDALRasterBand</span> <span class="o">*</span><span class="n">outBand</span> <span class="o">=</span> <span class="n">OutDs</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">outBand</span><span class="o">-&gt;</span><span class="n">RasterIO</span><span class="p">(</span><span class="n">GF_Write</span><span class="p">,</span>
+                      <span class="mi">0</span><span class="p">,</span>
+                      <span class="mi">0</span><span class="p">,</span>
+                      <span class="n">WidthAll</span><span class="p">,</span>
+                      <span class="n">HightAll</span><span class="p">,</span>
+                      <span class="n">outBuf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                      <span class="n">WidthAll</span><span class="p">,</span>
+                      <span class="n">HightAll</span><span class="p">,</span>
+                      <span class="n">GDT_Float32</span><span class="p">,</span>
+                      <span class="mi">0</span><span class="p">,</span>
+                      <span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">//关闭dataset之后，数据才会真正写入到文件中，否则都是在缓存中！！！</span>
+  <span class="n">GDALClose</span><span class="p">(</span><span class="n">OutDs</span><span class="p">);</span>
+  <span class="n">GDALClose</span><span class="p">(</span><span class="n">ds1</span><span class="p">);</span>
+  <span class="n">GDALClose</span><span class="p">(</span><span class="n">ds2</span><span class="p">);</span>
+
+  <span class="c1">//清理环境，删除new的数组、变量等</span>
+  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">BandNum</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">delete</span><span class="p">[]</span> <span class="n">InBuf1</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="k">delete</span><span class="p">[]</span> <span class="n">InBuf2</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="k">delete</span><span class="p">[]</span> <span class="n">outBuf</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="k">delete</span><span class="p">[]</span> <span class="n">InBuf1</span><span class="p">;</span>
+  <span class="k">delete</span><span class="p">[]</span> <span class="n">InBuf2</span><span class="p">;</span>
+  <span class="k">delete</span><span class="p">[]</span> <span class="n">outBuf</span><span class="p">;</span>
+  <span class="n">getchar</span><span class="p">();</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="zipandweb">
+<span id="id19"></span><h2>压缩文件与网络文件读取<a class="headerlink" href="#zipandweb" title="Permalink to this headline">¶</a></h2>
+<p>GDAL可以直接读取压缩文件或者网络中的影像数据,不过需要在文件名前加上特定前缀,GDAL工具和函数都可以使用.</p>
+<div class="section" id="id20">
+<h3>压缩文件<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<p>GDAL对zip文件有只读支持,对gz文件支持读写,注意随机读写压缩文件效率相当低.</p>
+<p>对于tar.gz/.tgz/.tar 等gzip文件来说,打开时,使用如下方式:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALDataset</span>  <span class="o">*</span><span class="n">poDataset</span><span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span> <span class="n">GDALOpen</span><span class="p">(</span> \
+                           <span class="s">&quot;/vsigzip/D:/test/1.tgz/aaa/cc.tif&quot;</span><span class="p">,</span>\
+                           <span class="n">GA_ReadOnly</span> <span class="p">);</span><span class="c1">//打开文件</span>
+</pre></div>
+</div>
+<p>注意打开时,添加 <code class="docutils literal"><span class="pre">/vsigzip/</span></code> 前缀</p>
+<p>类似,打开zip文件时,添加 <code class="docutils literal"><span class="pre">/vsizip/</span></code> 前缀:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalinfo /vsizip/d:/file.zip/test.tif
+</pre></div>
+</div>
+</div>
+<div class="section" id="id21">
+<h3>网络文件<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<p>在前面添加 <code class="docutils literal"><span class="pre">/vsicurl/</span></code> 前缀即可:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogrinfo -ro -al -so /vsicurl/http://example.org/gdal/trunk/data/poly.shp
+</pre></div>
+</div>
+<p>混合vsizip:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogrinfo -ro -al -so /vsizip/vsicurl/http://example.com/data/poly.zip
+</pre></div>
+</div>
+<p>用账户访问ftp:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogrinfo -ro -al -so /vsizip/vsicurl/ftp://usr:passwd@a.com/b/c.zip/d.shp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="other">
+<span id="id22"></span><h2>其他处理<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h2>
+<p>可以使用 <a class="reference internal" href="#gdaldriver"><span class="std std-ref">GdalDriver</span></a> 对已有影像数据进行删除、复制、重命名等处理，可以参见 <a class="reference external" href="http://www.gdal.org/classGDALDriver.html">GdalDriver类</a> 中的具体函数说明，下面使用一些例子来说明：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span><span class="c1">//注册类型，读取写入任何类型影像必须加入此句</span>
+<span class="n">GDALDriver</span> <span class="o">*</span><span class="n">poDriver</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pszFormat</span> <span class="o">=</span><span class="s">&quot;GTiff&quot;</span><span class="p">;</span>
+<span class="n">poDriver</span> <span class="o">=</span> <span class="n">GetGDALDriverManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="n">pszFormat</span><span class="p">);</span>
+<span class="n">poDriver</span><span class="o">-&gt;</span><span class="n">Delete</span><span class="p">(</span><span class="s">&quot;TempFile.tif&quot;</span><span class="p">);</span><span class="c1">//删除</span>
+<span class="n">poDirver</span><span class="o">-&gt;</span><span class="n">Rename</span><span class="p">(</span><span class="s">&quot;newName.tif&quot;</span><span class="p">,</span><span class="s">&quot;oldName.tif&quot;</span><span class="p">);</span><span class="c1">//重命名</span>
+<span class="n">poDirver</span><span class="o">-&gt;</span><span class="n">CopyFiles</span><span class="p">(</span><span class="s">&quot;Replica.tif&quot;</span><span class="p">,</span><span class="s">&quot;original.tif&quot;</span><span class="p">);</span><span class="c1">//复制</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gdal-utilities.html" class="btn btn-neutral float-right" title="GDAL工具集" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="gdal-data-model.html" class="btn btn-neutral" title="GDAL数据模型" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+  <br/>
+  <br/>
+  <!-- UY BEGIN -->
+  <div id="uyan_frame"></div>
+  <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=1858308"></script>
+  <!-- UY END -->
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2013-2017, wuqi.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

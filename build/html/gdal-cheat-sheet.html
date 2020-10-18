@@ -1,0 +1,642 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GDAL Cheat Sheet &mdash; headfirst gdal 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="headfirst gdal 0.1 documentation" href="index.html"/>
+        <link rel="next" title="GDALWarp" href="gdal-warp-api-tutorial.html"/>
+        <link rel="prev" title="GDAL工具集代码实现(C/C++)" href="gdal-tool-code.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> headfirst gdal
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preface.html">前言</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">影像是什么</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-data-model.html">GDAL数据模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read-and-write.html">栅格数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-utilities.html">GDAL工具集</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-tool-code.html">GDAL工具集代码实现(C/C++)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GDAL Cheat Sheet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#vector-operations">Vector operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#raster-operations">Raster operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#other">Other</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#sources">Sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-warp-api-tutorial.html">GDALWarp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="static-build.html">静态编译</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-architecture.html">OGR矢量结构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-proj.html">OGR投影简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-read-write.html">矢量数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-sql.html">OGR SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sqlite-sql.html">SQLite SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-utilities.html">OGR工具集</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">headfirst gdal</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>GDAL Cheat Sheet</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/gdal-cheat-sheet.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gdal-cheat-sheet">
+<span id="cheatsheet"></span><h1>GDAL Cheat Sheet<a class="headerlink" href="#gdal-cheat-sheet" title="Permalink to this headline">¶</a></h1>
+<p>本文为 <code class="docutils literal"><span class="pre">GitHub</span></code> 上的项目，原项目地址： <a class="reference external" href="https://github.com/dwtkns/gdal-cheat-sheet">https://github.com/dwtkns/gdal-cheat-sheet</a></p>
+<div class="section" id="vector-operations">
+<h2>Vector operations<a class="headerlink" href="#vector-operations" title="Permalink to this headline">¶</a></h2>
+<p><strong>Get vector information</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogrinfo -so input.shp layer-name
+</pre></div>
+</div>
+<p>Or, for all layers</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogrinfo -al -so input.shp
+</pre></div>
+</div>
+<p><strong>Print vector extent</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogrinfo input.shp layer-name | grep Extent
+</pre></div>
+</div>
+<p><strong>List vector drivers</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr --formats
+</pre></div>
+</div>
+<p><strong>Convert between vector formats</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -f &quot;GeoJSON&quot; output.json input.shp
+</pre></div>
+</div>
+<p><strong>Clip vectors by bounding box</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -f &quot;ESRI Shapefile&quot; output.shp input.shp -clipsrc
+        &lt;x_min&gt; &lt;y_min&gt; &lt;x_max&gt; &lt;y_max&gt;
+</pre></div>
+</div>
+<p><strong>Clip one vector by another</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -clipsrc clipping_polygon.shp output.shp input.shp
+</pre></div>
+</div>
+<p><strong>Reproject vector:</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr output.shp -t_srs &quot;EPSG:4326&quot; input.shp
+</pre></div>
+</div>
+<p><strong>Merge features in a vector file by attribute (“dissolve”)</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -f &quot;ESRI Shapefile&quot; dissolved.shp input.shp -dialect sqlite -sql
+  &quot;select ST_union(Geometry),common_attribute from input GROUP BY common_attribute&quot;
+</pre></div>
+</div>
+<p><strong>Merge vector files:</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr merged.shp input1.shp
+ogr2ogr -update -append merged.shp input2.shp -nln merged
+</pre></div>
+</div>
+<p><strong>Extract from a vector file based on query</strong></p>
+<p>To extract features with STATENAME ‘New York’,’New Hampshire’, etc. from
+states.shp</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -where &#39;STATENAME like &quot;New%&quot;&#39; states_subset.shp states.shp
+</pre></div>
+</div>
+<p>To extract type ‘pond’ from water.shp</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -where &quot;type = pond&quot; ponds.shp water.shp
+</pre></div>
+</div>
+<p><strong>Subset &amp; filter all shapefiles in a directory</strong></p>
+<p>Assumes that filename and name of layer of interest are the same…</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ls -1 *.shp | sed &#39;s/.shp//g&#39; | xargs -n1 -I % ogr2ogr %-subset.shp %.shp
+   -sql &quot;SELECT field-one, field-two FROM &#39;%&#39; WHERE field-one=&#39;value-of-interest&#39;&quot;
+</pre></div>
+</div>
+</div>
+<div class="section" id="raster-operations">
+<h2>Raster operations<a class="headerlink" href="#raster-operations" title="Permalink to this headline">¶</a></h2>
+<p><strong>Get raster information</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalinfo input.tif
+</pre></div>
+</div>
+<p><strong>List raster drivers</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_translate --formats
+</pre></div>
+</div>
+<p><strong>Convert between raster formats</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_translate -of &quot;GTiff&quot; input.grd output.tif
+</pre></div>
+</div>
+<p><strong>Convert 16-bit bands (Int16 or UInt16) to Byte type</strong>
+(Useful for Landsat 8 imagery…)</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_translate -of &quot;GTiff&quot; -co &quot;COMPRESS=LZW&quot; -scale 0 65535 0 255
+    -ot Byte input_uint16.tif output_byte.tif
+</pre></div>
+</div>
+<p>You can change ‘0’ and ‘65535’ to your image’s actual min/max values to
+preserve more color variation or to apply the scaling to other band
+types - find that number with:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalinfo -mm input.tif | grep Min/Max
+</pre></div>
+</div>
+<p><strong>Convert a directory of files to a different raster format</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ls -1 *.img | sed &#39;s/.img//g&#39; | xargs -n1 -I % gdal_translate
+        -of &quot;GTiff&quot; %.img %.tif
+</pre></div>
+</div>
+<p><strong>Reproject raster:</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp -t_srs &quot;EPSG:102003&quot; input.tif output.tif
+</pre></div>
+</div>
+<p>Be sure to add <em>-r bilinear</em> if reprojecting elevation data to prevent
+funky banding artifacts.</p>
+<p><strong>Georeference an unprojected image with known bounding coordinates:</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_translate -of GTiff -a_ullr &lt;top_left_lon&gt; &lt;top_left_lat&gt;
+    &lt;bottom_right_lon&gt; &lt;bottom_right_lat&gt; -a_srs EPSG:4269 input.png output.tif
+</pre></div>
+</div>
+<p><strong>Clip raster by bounding box</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp -te &lt;x_min&gt; &lt;y_min&gt; &lt;x_max&gt; &lt;y_max&gt; input.tif clipped_output.tif
+</pre></div>
+</div>
+<p><strong>Clip raster to SHP / NoData for pixels beyond polygon boundary</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp -dstnodata &lt;nodata_value&gt; -cutline input_polygon.shp
+    input.tif clipped_output.tif
+</pre></div>
+</div>
+<p><strong>Crop raster dimensions to vector bounding box</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp -cutline cropper.shp -crop_to_cutline input.tif cropped_output.tif
+</pre></div>
+</div>
+<p><strong>Merge rasters</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_merge.py -o merged.tif input1.tif input2.tif
+</pre></div>
+</div>
+<p>Alternatively,</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp input1.tif input2.tif merged.tif
+</pre></div>
+</div>
+<p>Or, to preserve nodata values:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp input1.tif input2.tif merged.tif -srcnodata &lt;nodata_value&gt;
+    -dstnodata &lt;merged_nodata_value&gt;
+</pre></div>
+</div>
+<p><strong>Stack grayscale bands into a georeferenced RGB</strong></p>
+<p>Where LC81690372014137LGN00 is a Landsat 8 ID and B4, B3 and B2
+correspond to R,G,B bands respectively:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_merge.py -co &quot;PHOTOMETRIC=RGB&quot; -separate LC81690372014137LGN00_B{4,3,2}.tif
+    -o LC81690372014137LGN00_rgb.tif
+</pre></div>
+</div>
+<p><strong>Fix an RGB TIF whose bands don’t know they’re RGB</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_merge.py -co &quot;PHOTOMETRIC=RGB&quot; input.tif -o output_rgb.tif
+</pre></div>
+</div>
+<p><strong>Export a raster for Google Earth</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_translate -of KMLSUPEROVERLAY input.tif output.kmz -co FORMAT=JPEG
+</pre></div>
+</div>
+<p><strong>Raster calculation (map algebra)</strong></p>
+<p>Average two rasters:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_calc.py -A input1.tif -B input2.tif --outfile=output.tif --calc=&quot;(A+B)/2&quot;
+</pre></div>
+</div>
+<p>Add two rasters:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_calc.py -A input1.tif -B input2.tif --outfile=output.tif --calc=&quot;A+B&quot;
+</pre></div>
+</div>
+<p>etc.</p>
+<p><strong>Create a hillshade from a DEM</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdaldem hillshade -of PNG input.tif hillshade.png
+</pre></div>
+</div>
+<p>Change light direction:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdaldem hillshade -of PNG -az 135 input.tif hillshade_az135.png
+</pre></div>
+</div>
+<p>Use correct vertical scaling in meters if input is projected in degrees</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdaldem hillshade -s 111120 -of PNG input_WGS1984.tif hillshade.png
+</pre></div>
+</div>
+<p><strong>Apply color ramp to a DEM</strong>
+First, create a color-ramp.txt file:
+<em>(Height, Red, Green, Blue)</em></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>0 110 220 110
+900 240 250 160
+1300 230 220 170
+1900 220 220 220
+2500 250 250 250
+</pre></div>
+</div>
+<p>Then apply those colors to a DEM:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdaldem color-relief input.tif color_ramp.txt color-relief.tif
+</pre></div>
+</div>
+<p><strong>Create slope-shading from a DEM</strong>
+First, make a slope raster from DEM:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdaldem slope input.tif slope.tif
+</pre></div>
+</div>
+<p>Second, create a color-slope.txt file:
+<em>(Slope angle, Red, Green, Blue)</em></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>0 255 255 255
+90 0 0 0
+</pre></div>
+</div>
+<p>Finally, color the slope raster based on angles in color-slope.txt:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdaldem color-relief slope.tif color-slope.txt slopeshade.tif
+</pre></div>
+</div>
+<p><strong>Resample (resize) raster</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp -ts &lt;width&gt; &lt;height&gt; -r cubicspline dem.tif resampled_dem.tif
+</pre></div>
+</div>
+<p>Entering 0 for either width or height guesses based on current
+dimensions.</p>
+<p><strong>Burn vector into raster</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_rasterize -b 1 -i -burn -32678 -l layername input.shp input.tif
+</pre></div>
+</div>
+<p><strong>Create contours from DEM</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_contour -a elev -i 50 input_dem.tif output_contours.shp
+</pre></div>
+</div>
+<p><strong>Get values for a specific location in a raster</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdallocationinfo -xml -wgs84 input.tif &lt;lon&gt; &lt;lat&gt;
+</pre></div>
+</div>
+<div class="section" id="other">
+<h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
+<p><strong>Convert KML points to CSV (simple)</strong></p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -f CSV output.csv input.kmz -lco GEOMETRY=AS_XY
+</pre></div>
+</div>
+<p><strong>Convert KML to CSV (WKT)</strong>
+First list layers in the KML file</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogrinfo -so input.kml
+</pre></div>
+</div>
+<p>Convert the desired KML layer to CSV</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -f CSV output.csv input.kml -sql &quot;select *,OGR_GEOM_WKT from some_kml_layer&quot;
+</pre></div>
+</div>
+<p><strong>CSV points to SHP</strong>
+<em>This section needs retooling</em>
+Given input.csv</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>lon_column,lat_column,value
+-81,32,13
+-81,32,14
+-81,32,15
+</pre></div>
+</div>
+<p>Make a .dbf table for ogr2ogr to work with from input.csv</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ogr2ogr -f &quot;ESRI Shapefile&quot; input.dbf input.csv
+</pre></div>
+</div>
+<p>Use a text editor to create a .vrt file in the same directory as
+input.csv and input.dbf. This file holds the parameters for building a
+full shapefile based on values in the DBF you just made.</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="nt">&lt;OGRVRTDataSource&gt;</span>
+  &lt;OGRVRTLayer name=&quot;output_file_name&quot;&gt;
+    &lt;SrcDataSource relativeToVRT=&quot;1&quot;&gt;./&lt;/SrcDataSource&gt;
+    &lt;SrcLayer&gt;input&lt;/SrcLayer&gt;
+    &lt;GeometryType&gt;wkbPoint&lt;/GeometryType&gt;
+    &lt;LayerSRS&gt;WGS84&lt;/LayerSRS&gt;
+    &lt;GeometryField encoding=&quot;PointFromColumns&quot; x=&quot;lon_column&quot; y=&quot;lat_column&quot;/&gt;
+  &lt;/OGRVRTLayer&gt;
+<span class="nt">&lt;/OGRVRTDataSource&gt;</span>
+</pre></div>
+</div>
+<p>Create shapefile based on parameters listed in the .vrt</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>mkdir shp
+ogr2ogr -f &quot;ESRI Shapefile&quot; shp/ inputfile.vrt
+</pre></div>
+</div>
+<p>The VRT file can be modified to give a new output shapefile name,
+reference a different coordinate system (LayerSRS), or pull coordinates
+from different columns.</p>
+<p><strong>MODIS operations</strong></p>
+<p>First, download relevant .hdf tiles from the MODIS ftp site:
+<a class="reference external" href="ftp://ladsftp.nascom.nasa.gov/">ftp://ladsftp.nascom.nasa.gov/</a>; use the <a class="reference external" href="http://www.geohealth.ou.edu/modis_v5/modis.shtml">MODIS sinusoidal
+grid</a> for
+reference.</p>
+<p>Create a file containing the names of all .hdf files in the directory</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>ls -1 *.hdf &gt; files.txt
+</pre></div>
+</div>
+<p>List MODIS Subdatasets in a given HDF (conf. the <a class="reference external" href="https://lpdaac.usgs.gov/products/modis_products_table/">MODIS products
+table</a>)</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalinfo longFileName.hdf | grep SUBDATASET
+</pre></div>
+</div>
+<p>Make TIFs from each file in list; replace ‘MOD12Q1:Land_Cover_Type_1’
+with desired Subdataset name</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>mkdir output
+cat files.txt | xargs -I % -n1 gdalwarp -of GTiff
+    &#39;HDF4_EOS:EOS_GRID:%:MOD12Q1:Land_Cover_Type_1&#39; output/%.tif
+</pre></div>
+</div>
+<p>Merge all .tifs in output directory into single file</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>cd output
+gdal_merge.py -o Merged_Landcover.tif *.tif
+</pre></div>
+</div>
+<p><strong>BASH functions</strong></p>
+<p><em>Size Functions</em></p>
+<p>This size function echos the pixel dimensions of a given file in the format expected by gdalwarp.</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>function gdal_size() {
+    SIZE=$(gdalinfo $1 |\
+        grep &#39;Size is &#39; |\
+        cut -d\   -f3-4 |\
+        sed &#39;s/,//g&#39;)
+    echo -n &quot;$SIZE&quot;
+}
+</pre></div>
+</div>
+<p>This can be used to easily resample one raster to the dimensions of
+another:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdalwarp -ts $(gdal_size bigraster.tif) -r cubicspline
+    smallraster.tif resampled_smallraster.tif
+</pre></div>
+</div>
+<p><em>Extent Functions</em></p>
+<p>These extent functions echo the extent of the given file in the
+order/format expected by gdal_translate -projwin. (Originally from
+<a class="reference external" href="http://linfiniti.com/2009/09/clipping-rasters-with-gdal-using-polygons/">Linfiniti</a>).</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>function gdal_extent() {
+    if [ -z &quot;$1&quot; ]; then
+        echo &quot;Missing arguments. Syntax:&quot;
+        echo &quot;  gdal_extent &lt;input_raster&gt;&quot;
+        return
+    fi
+    EXTENT=$(gdalinfo $1 |\
+        grep &quot;Upper Left\|Lower Right&quot; |\
+        sed &quot;s/Upper Left  //g;s/Lower Right //g;s/).*//g&quot; |\
+        tr &quot;\n&quot; &quot; &quot; |\
+        sed &#39;s/ *$//g&#39; |\
+        tr -d &quot;[(,]&quot;)
+    echo -n &quot;$EXTENT&quot;
+}
+
+function ogr_extent() {
+    if [ -z &quot;$1&quot; ]; then
+        echo &quot;Missing arguments. Syntax:&quot;
+        echo &quot;  ogr_extent &lt;input_vector&gt;&quot;
+        return
+    fi
+    EXTENT=$(ogrinfo -al -so $1 |\
+        grep Extent |\
+        sed &#39;s/Extent: //g&#39; |\
+        sed &#39;s/(//g&#39; |\
+        sed &#39;s/)//g&#39; |\
+        sed &#39;s/ - /, /g&#39;)
+    EXTENT=<span class="nv">`echo $EXTENT | awk -F &#39;,&#39; &#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;`</span>
+    echo -n &quot;$EXTENT&quot;
+}
+
+function ogr_layer_extent() {
+    if [ -z &quot;$2&quot; ]; then
+        echo &quot;Missing arguments. Syntax:&quot;
+        echo &quot;  ogr_extent &lt;input_vector&gt; &lt;layer_name&gt;&quot;
+        return
+    fi
+    EXTENT=$(ogrinfo -so $1 $2 |\
+        grep Extent |\
+        sed &#39;s/Extent: //g&#39; |\
+        sed &#39;s/(//g&#39; |\
+        sed &#39;s/)//g&#39; |\
+        sed &#39;s/ - /, /g&#39;)
+    EXTENT=<span class="nv">`echo $EXTENT | awk -F &#39;,&#39; &#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;`</span>
+    echo -n &quot;$EXTENT&quot;
+}
+</pre></div>
+</div>
+<p>Extents can be passed directly into a gdal_translate command like so:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_translate -projwin $(ogr_extent boundingbox.shp) input.tif clipped_output.tif
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>gdal_translate -projwin $(gdal_extent target_crop.tif) input.tif clipped_output.tif
+</pre></div>
+</div>
+<p>This can be a useful way to quickly crop one raster to the same extent
+as another. Add these to your ~/.bash_profile file for easy terminal
+access.</p>
+</div>
+</div>
+<div class="section" id="sources">
+<h2>Sources<a class="headerlink" href="#sources" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://live.osgeo.org/en/quickstart/gdal_quickstart.html">http://live.osgeo.org/en/quickstart/gdal_quickstart.html</a></p>
+<p><a class="reference external" href="https://github.com/nvkelso/geo-how-to/wiki/OGR-to-reproject,-modify-Shapefiles">https://github.com/nvkelso/geo-how-to/wiki/OGR-to-reproject,-modify-Shapefiles</a></p>
+<p><a class="reference external" href="ftp://ftp.remotesensing.org/gdal/presentations/OpenSource_Weds_Andre_CUGOS.pdf">ftp://ftp.remotesensing.org/gdal/presentations/OpenSource_Weds_Andre_CUGOS.pdf</a></p>
+<p><a class="reference external" href="http://developmentseed.org/blog/2009/jul/30/using-open-source-tools-make-elevation-maps-afghanistan-and-pakistan/">http://developmentseed.org/blog/2009/jul/30/using-open-source-tools-make-elevation-maps-afghanistan-and-pakistan/</a></p>
+<p><a class="reference external" href="http://linfiniti.com/2010/12/a-workflow-for-creating-beautiful-relief-shaded-dems-using-gdal/">http://linfiniti.com/2010/12/a-workflow-for-creating-beautiful-relief-shaded-dems-using-gdal/</a></p>
+<p><a class="reference external" href="http://linfiniti.com/2009/09/clipping-rasters-with-gdal-using-polygons/">http://linfiniti.com/2009/09/clipping-rasters-with-gdal-using-polygons/</a></p>
+<p><a class="reference external" href="http://nautilus.baruch.sc.edu/twiki_dmcc/bin/view/Main/OGR_example">http://nautilus.baruch.sc.edu/twiki_dmcc/bin/view/Main/OGR_example</a></p>
+<p><a class="reference external" href="http://www.gdal.org/frmt_hdf4.html">http://www.gdal.org/frmt_hdf4.html</a></p>
+<p><a class="reference external" href="http://planetflux.adamwilson.us/2010/06/modis-processing-with-r-gdal-and-nco.html">http://planetflux.adamwilson.us/2010/06/modis-processing-with-r-gdal-and-nco.html</a></p>
+<p><a class="reference external" href="http://trac.osgeo.org/gdal/wiki/FAQRaster">http://trac.osgeo.org/gdal/wiki/FAQRaster</a></p>
+<p><a class="reference external" href="http://www.mikejcorey.com/wordpress/2011/02/05/tutorial-create-beautiful-hillshade-maps-from-digital-elevation-models-with-gdal-and-mapnik/">http://www.mikejcorey.com/wordpress/2011/02/05/tutorial-create-beautiful-hillshade-maps-from-digital-elevation-models-with-gdal-and-mapnik/</a></p>
+<p><a class="reference external" href="http://dirkraffel.com/2011/07/05/best-way-to-merge-color-relief-with-shaded-relief-map/">http://dirkraffel.com/2011/07/05/best-way-to-merge-color-relief-with-shaded-relief-map/</a></p>
+<p><a class="reference external" href="http://gfoss.blogspot.com/2008/06/gdal-raster-data-tips-and-tricks.html">http://gfoss.blogspot.com/2008/06/gdal-raster-data-tips-and-tricks.html</a></p>
+<p><a class="reference external" href="http://osgeo-org.1560.x6.nabble.com/gdal-dev-Dissolve-shapefile-using-GDAL-OGR-td5036930.html">http://osgeo-org.1560.x6.nabble.com/gdal-dev-Dissolve-shapefile-using-GDAL-OGR-td5036930.html</a></p>
+<p><a class="reference external" href="https://www.mapbox.com/tilemill/docs/guides/terrain-data/">https://www.mapbox.com/tilemill/docs/guides/terrain-data/</a></p>
+<p><a class="reference external" href="https://gist.github.com/ashaw/0862ec044c45b9aa3c76">https://gist.github.com/ashaw/0862ec044c45b9aa3c76</a></p>
+<p><a class="reference external" href="https://github.com/gina-alaska/dans-gdal-scripts">https://github.com/gina-alaska/dans-gdal-scripts</a></p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gdal-warp-api-tutorial.html" class="btn btn-neutral float-right" title="GDALWarp" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="gdal-tool-code.html" class="btn btn-neutral" title="GDAL工具集代码实现(C/C++)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+  <br/>
+  <br/>
+  <!-- UY BEGIN -->
+  <div id="uyan_frame"></div>
+  <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=1858308"></script>
+  <!-- UY END -->
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2013-2017, wuqi.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>OGR SQL &mdash; headfirst gdal 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+    <link rel="canonical" href="hiw1hhgogr-sql.html"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SQLite SQL" href="sqlite-sql.html" />
+    <link rel="prev" title="矢量数据读写" href="ogr-read-write.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> headfirst gdal
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preface.html">前言</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">影像是什么</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-data-model.html">GDAL数据模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read-and-write.html">栅格数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-utilities.html">GDAL工具集</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-tool-code.html">GDAL工具集代码实现(C/C++)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-alg.html">GDAL算法简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-cheat-sheet.html">GDAL Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-warp-api-tutorial.html">GDALWarp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="static-build.html">静态编译</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-architecture.html">OGR矢量结构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-proj.html">OGR投影简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-read-write.html">矢量数据读写</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">OGR SQL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#select">SELECT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#special-fields">SPECIAL FIELDS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fid">FID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ogr-geometry">OGR_GEOMETRY</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ogr-geom-wkt">OGR_GEOM_WKT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ogr-geom-area">OGR_GEOM_AREA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ogr-style">OGR_STYLE</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#alter-table">ALTER TABLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#executesql">ExecuteSQL()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#non-ogr-sql">Non-OGR SQL</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sqlite-sql.html">SQLite SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-utilities.html">OGR工具集</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">headfirst gdal</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>OGR SQL</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ogr-sql.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ogr-sql">
+<span id="ogrsql"></span><span id="ogrsql-ogrsql"></span><h1>OGR SQL<a class="headerlink" href="#ogr-sql" title="Permalink to this headline">¶</a></h1>
+<p>本章来源：</p>
+<ul class="simple">
+<li>GDAL官网: <a class="reference external" href="http://www.gdal.org/ogr_sql.html">OGR SQL</a></li>
+<li>GDAL WIKI: <a class="reference external" href="https://trac.osgeo.org/gdal/wiki/rfc28_sqlfunc">RFC 28: OGR SQL Generalized Expressions</a></li>
+</ul>
+<div class="section" id="id2">
+<h2>简介<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">GDALDataset</span></code> 支持使用 <code class="docutils literal"><span class="pre">GDALDataset::ExecuteSQL()</span></code> 进行SQL操作,理论上该方法可以支持任何命令,但实际上主要是SQL SELECT 的子集.本篇主要讨论基本SQL和OGR实现的SQL,以及特定驱动的SQL支持.</p>
+<p>自GDAL/OGR 1.10 起,可以使用SQLITE语法代替OGRSQL语法,SQLITE语法将在下文中详细介绍</p>
+<p><code class="docutils literal"><span class="pre">OGRLayer::SetAttributeFilter()</span></code> 方法中也支持OGRSQL过滤,用法与SELECT语句中WHERE从句用法一致</p>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">OGR SQL在 版本1.8.0后有效,最好升级到新的版本中</p>
+</div>
+</div>
+<div class="section" id="select">
+<h2>SELECT<a class="headerlink" href="#select" title="Permalink to this headline">¶</a></h2>
+<p>语法如下:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>SELECT &lt;field-list&gt; FROM &lt;table_def&gt;
+     [LEFT JOIN &lt;table_def&gt;
+      ON [<span class="nt">&lt;table_ref&gt;</span>.]&lt;key_field&gt; = [<span class="nt">&lt;table_ref&gt;</span>.].&lt;key_field&gt;]*
+     [WHERE &lt;where-expr&gt;]
+     [ORDER BY &lt;sort specification list&gt;]
+
+<span class="nt">&lt;field-list&gt;</span> ::= &lt;column-spec&gt; [ { , &lt;column-spec&gt; }... ]
+
+<span class="nt">&lt;column-spec&gt;</span> ::= &lt;field-spec&gt; [ &lt;as clause&gt; ]
+                 | CAST ( &lt;field-spec&gt; AS &lt;data type&gt; ) [ &lt;as clause&gt; ]
+
+<span class="nt">&lt;field-spec&gt;</span> ::= [DISTINCT] &lt;field_ref&gt;
+                 | &lt;cumm-field-func&gt; ( [DISTINCT] &lt;field-ref&gt; )
+                 <span class="o">|</span> &lt;field-expr&gt;
+                 <span class="o">|</span> Count(*)
+
+<span class="nt">&lt;field-expr&gt;</span> ::= &lt;field_ref&gt;
+                 | &lt;constant-value&gt;
+                 <span class="o">|</span> &lt;field-expr&gt; &lt;field-operator&gt; &lt;field-expr&gt;
+                 <span class="o">|</span> &lt;field-func&gt; ( &lt;field-expr-list&gt; )
+                 <span class="o">|</span> ( &lt;field-expr&gt; )
+
+<span class="nt">&lt;field-expr-list&gt;</span> ::= field-expr
+                 |  field-expr , field-expr-list
+                 <span class="o">|</span>  &lt;empty&gt;
+
+<span class="nt">&lt;as clause&gt;</span> ::= [ AS ] &lt;column_name&gt;
+
+<span class="nt">&lt;data type&gt;</span> ::= character [ ( field_length ) ]
+                | float [ ( field_length ) ]
+                <span class="o">|</span> numeric [ ( field_length [, field_precision ] ) ]
+                <span class="o">|</span> integer [ ( field_length ) ]
+                <span class="o">|</span> date [ ( field_length ) ]
+                <span class="o">|</span> time [ ( field_length ) ]
+                <span class="o">|</span> timestamp [ ( field_length ) ]
+
+<span class="nt">&lt;cumm-field-func&gt;</span> ::= AVG | MAX | MIN | SUM | COUNT
+
+<span class="nt">&lt;field-operator&gt;</span> ::= &#39;+&#39; | &#39;-&#39; | &#39;/&#39; | &#39;*&#39; | &#39;||&#39;
+
+<span class="nt">&lt;field-func&gt;</span> ::= CONCAT | SUBSTR
+
+<span class="nt">&lt;field_ref&gt;</span>  ::= [<span class="nt">&lt;table_ref&gt;</span>.]field_name
+</pre></div>
+</div>
+</div>
+<div class="section" id="special-fields">
+<h2>SPECIAL FIELDS<a class="headerlink" href="#special-fields" title="Permalink to this headline">¶</a></h2>
+<p>OGR SQL中有一些特殊属性可以使用.比如几何属性等.</p>
+<div class="section" id="fid">
+<h3>FID<a class="headerlink" href="#fid" title="Permalink to this headline">¶</a></h3>
+<p>一般FID不作为要素的属性,只用于标识,但某些情况下能方便的查询,*不包括FID,所以必须单独写出来</p>
+<div class="highlight-sql"><div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">FID</span><span class="p">,</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">nation</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ogr-geometry">
+<h3>OGR_GEOMETRY<a class="headerlink" href="#ogr-geometry" title="Permalink to this headline">¶</a></h3>
+<p>MapInfo等数据类型中可以在同一层使用多种几何类型,所以可以使用此字段进行选择:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">nation</span> <span class="k">WHERE</span> <span class="n">OGR_GEOMETRY</span><span class="o">=</span><span class="s1">&#39;POINT&#39;</span> <span class="k">OR</span> <span class="n">OGR_GEOMETRY</span><span class="o">=</span><span class="s1">&#39;POLYGON&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ogr-geom-wkt">
+<h3>OGR_GEOM_WKT<a class="headerlink" href="#ogr-geom-wkt" title="Permalink to this headline">¶</a></h3>
+<p>OGR_GEOM_WKT 可以显示要素的WKT串作为输出,也可以在WHERE从句中指定WKT类型等进行过滤:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>SELECT OGR_GEOM_WKT, * FROM nation;
+SELECT OGR_GEOM_WKT, * FROM nation WHERE OGR_GEOM_WKT \
+        LIKE &#39;POINT%&#39; OR OGR_GEOM_WKT LIKE &#39;POLYGON%&#39;;
+</pre></div>
+</div>
+</div>
+<div class="section" id="ogr-geom-area">
+<h3>OGR_GEOM_AREA<a class="headerlink" href="#ogr-geom-area" title="Permalink to this headline">¶</a></h3>
+<p>该字段使用OGRSurface::get_Area() 方法获取几何要素的面积,如果不是面状要素,则返回0</p>
+<div class="highlight-sql"><div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">nation</span> <span class="k">WHERE</span> <span class="n">OGR_GEOM_AREA</span> <span class="o">&gt;</span> <span class="mi">10000000</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ogr-style">
+<h3>OGR_STYLE<a class="headerlink" href="#ogr-style" title="Permalink to this headline">¶</a></h3>
+<p>该字段代表使用OGRFeature::GetStyleString()获取的字符串,一般用于where从句过滤</p>
+<div class="highlight-sql"><div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">nation</span> <span class="k">WHERE</span> <span class="n">OGR_STYLE</span> <span class="k">LIKE</span> <span class="s1">&#39;LABEL%&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="alter-table">
+<h2>ALTER TABLE<a class="headerlink" href="#alter-table" title="Permalink to this headline">¶</a></h2>
+<p>用于增删改字段,主要用法如下:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span></span><span class="cm">/*添加字段*/</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">tablename</span> <span class="k">ADD</span> <span class="p">[</span><span class="k">COLUMN</span><span class="p">]</span> <span class="n">columnname</span> <span class="n">columntype</span>
+<span class="cm">/*重命名字段*/</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">tablename</span> <span class="k">RENAME</span> <span class="p">[</span><span class="k">COLUMN</span><span class="p">]</span> <span class="n">oldcolumnname</span> <span class="k">TO</span> <span class="n">newcolumnname</span>
+<span class="cm">/*修改字段类型*/</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">tablename</span> <span class="k">ALTER</span> <span class="p">[</span><span class="k">COLUMN</span><span class="p">]</span> <span class="n">columnname</span> <span class="k">TYPE</span> <span class="n">columntype</span>
+<span class="cm">/*删除字段*/</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">tablename</span> <span class="k">DROP</span> <span class="p">[</span><span class="k">COLUMN</span><span class="p">]</span> <span class="n">columnname</span>
+</pre></div>
+</div>
+<p>支持的数据类型如下:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>boolean     /<span class="ge">*GDAL&gt;2.0*</span>/
+character   /<span class="ge">*需要指定field_length,默认为1*</span>/
+float       /<span class="ge">*field_length*</span>/
+numeric     /<span class="ge">*field_length, field_precision*</span>/
+smallint    /<span class="ge">*field_length 16bit signed integer GDAL&gt;2.0*</span>/
+integer     /<span class="ge">*field_length*</span>/
+bigint      /<span class="ge">*field_length 64bit integer GDAL&gt;2.0*</span>/
+date        /<span class="ge">*field_length*</span>/
+time        /<span class="ge">*field_length*</span>/
+timestamp   /<span class="ge">*field_length*</span>/
+geometry,geometry/<span class="ge">*geometry_type*</span>/,geometry/<span class="ge">*geometry_type,type_code*</span>/
+</pre></div>
+</div>
+<p>例如,可以使用ogrinfo 命令,修改文件字段</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ogrinfo -sql <span class="s2">&quot;alter table out add COLUMN myfield integer&quot;</span> out.shp
+</pre></div>
+</div>
+</div>
+<div class="section" id="executesql">
+<h2>ExecuteSQL()<a class="headerlink" href="#executesql" title="Permalink to this headline">¶</a></h2>
+<p>只有GDALDataset才能执行ExecuteSQL函数,该函数不针对Layer处理</p>
+<div class="highlight-sql"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">* @param pszSQLCommand     SQL命令</span>
+<span class="cm">* @param poSpatialFilter   空间范围设定</span>
+<span class="cm">* @param pszDialect        针对不同驱动,有不同语法,一般置为NULL</span>
+<span class="cm">*/</span>
+<span class="n">OGRLayer</span> <span class="o">*</span> <span class="n">GDALDataset</span><span class="p">::</span><span class="n">ExecuteSQL</span><span class="p">(</span> <span class="n">const</span> <span class="nb">char</span> <span class="o">*</span><span class="n">pszSQLCommand</span><span class="p">,</span>
+                                      <span class="n">OGRGeometry</span> <span class="o">*</span><span class="n">poSpatialFilter</span><span class="p">,</span>
+                                      <span class="n">const</span> <span class="nb">char</span> <span class="o">*</span><span class="n">pszDialect</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="non-ogr-sql">
+<h2>Non-OGR SQL<a class="headerlink" href="#non-ogr-sql" title="Permalink to this headline">¶</a></h2>
+<p>MySQL, PostgreSQL  PostGIS (PG), Oracle (OCI), SQLite, ODBC, ESRI Personal Geodatabase (PGeo)  MS SQL Spatial (MSSQLSpatial) 这些数据库系统都自己重写了
+GDALDataset::ExecuteSQL()  方法,有些语法上有细微的差别,另外其他语句也可以在这些驱动中运行.但是只有 SQL WHERE 语句才能返回 Layer.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sqlite-sql.html" class="btn btn-neutral float-right" title="SQLite SQL" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ogr-read-write.html" class="btn btn-neutral" title="矢量数据读写" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2013-2018, wuqi.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

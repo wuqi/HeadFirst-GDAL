@@ -1,0 +1,4 @@
+glob:_build*
+glob:*.orig
+syntax: glob
+theme/sphinx_rtd_theme_new/

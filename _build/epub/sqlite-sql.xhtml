@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <meta charset="utf-8" />
+    <title>SQLite SQL</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> 
+  </head>
+  <body>
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sqlite-sql">
+<span id="sqlitesql"></span><span id="sqlitesql-sqlitesql"></span><h1>SQLite SQL</h1>
+<p>本章来源:</p>
+<ul class="simple">
+<li><p>SQLite: <a class="reference external" href="http://www.gdal.org/ogr_sql_sqlite.html">SQLite SQL dialect</a><span class="link-target"> [http://www.gdal.org/ogr_sql_sqlite.html]</span></p></li>
+<li><p>SpatiaLite: <a class="reference external" href="http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html">SpatiaLite 4.3.0 SQL functions reference list</a><span class="link-target"> [http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html]</span></p></li>
+</ul>
+<div class="section" id="id1">
+<h2>简介</h2>
+<p>GDAL 1.10 版本后,可以使用 Sqlite 语法代替 ogrsql 语法.大部分语法支持都需要Spatialite库. 执行方式同样调用 GDALDataset::ExecuteSQL()  ,但是需要指定 pszDialect 参数为 “SQLITE”.</p>
+</div>
+<div class="section" id="select-statement">
+<h2>SELECT statement</h2>
+<p>简单 select 语句如下:</p>
+<img alt="simple select statement" class="align-center" src="_images/simple-select-stmt.png" />
+<p>select 语法图如下:</p>
+<img alt="select statement" class="align-center" src="_images/select-stmt.png" />
+<p>join 语法如下:</p>
+<img alt="join clause" class="align-center" src="_images/join-clause.png" />
+</div>
+<div class="section" id="spatialite-sql">
+<h2>Spatialite SQL</h2>
+<p>可以参考网站 <a class="reference external" href="http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html">SpatiaLite 4.3.0 SQL functions reference list</a><span class="link-target"> [http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html]</span> 上的说明,下面列出来几个常用的,需要GEOS库支持</p>
+<p>SQL functions that implement spatial operators</p>
+<table class="docutils">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 69%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Syntax</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td rowspan="2"><p>Intersection</p></td>
+<td><div class="line-block">
+<div class="line">Intersection( geom1 Geometry , geom2 Geometry )</div>
+<div class="line">:Geometry</div>
+</div>
+</td>
+<td rowspan="2"><p>两物求交</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_Intersection( geom1 Geometry , geom2 Geometry )</div>
+<div class="line">:Geometry</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>Difference</p></td>
+<td><div class="line-block">
+<div class="line">Difference( geom1 Geometry , geom2 Geometry )</div>
+<div class="line">:Geometry</div>
+</div>
+</td>
+<td rowspan="2"><p>两物求差</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_Difference( geom1 Geometry , geom2 Geometry )</div>
+<div class="line">:Geometry</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>GUnion</p></td>
+<td><p>GUnion( geom1 Geometry , geom2 Geometry ) : Geometry</p></td>
+<td rowspan="2"><p>两物求并</p></td>
+</tr>
+<tr class="row-odd"><td><p>ST_Union( geom1 Geometry , geom2 Geometry ) : Geometry</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>GUnion</p></td>
+<td><p>GUnion( geom1 Geometry ) : Geometry</p></td>
+<td rowspan="2"><p>整体求并</p></td>
+</tr>
+<tr class="row-odd"><td><p>ST_Union( geom1 Geometry ) : Geometry</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>Collect</p></td>
+<td><p>Collect( geom1 Geometry , geom2 Geometry ) : Geometry</p></td>
+<td rowspan="2"><p>合并两者</p></td>
+</tr>
+<tr class="row-odd"><td><p>ST_Collect( geom1 Geometry , geom2 Geometry ):Geometry</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>Collect</p></td>
+<td><p>Collect( geom Geometry ) : Geometry</p></td>
+<td rowspan="2"><p>合并集合</p></td>
+</tr>
+<tr class="row-odd"><td><p>ST_Collect( geom Geometry ) : Geometry</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 66%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Syntax</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td rowspan="2"><p>SymDifference</p></td>
+<td><div class="line-block">
+<div class="line">SymDifference( geom1 Geometry ,</div>
+<div class="line">geom2 Geometry ):Geometry</div>
+</div>
+</td>
+<td rowspan="2"><div class="line-block">
+<div class="line">两物</div>
+<div class="line">逻辑或</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_SymDifference(geom1 Geometry</div>
+<div class="line">,geom2 Geometry ):Geometry</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>Buffer</p></td>
+<td><div class="line-block">
+<div class="line">Buffer( geom Geometry , dist Double precision[,</div>
+<div class="line">quadrantsegments int] ):Geometry</div>
+</div>
+</td>
+<td rowspan="2"><p>缓冲区</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_Buffer( geom Geometry , dist Double precision[,</div>
+<div class="line">quadrantsegments int] ):Geometry</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><div class="line-block">
+<div class="line">Hausdorff</div>
+<div class="line">Distance</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">HausdorffDistance( geom1 Geometry , geom2 Geometry )</div>
+<div class="line">: Double precision</div>
+</div>
+</td>
+<td rowspan="2"><p>豪斯多夫距离</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_HausdorffDistance( geom1 Geometry, geom2 Geometry)</div>
+<div class="line">:Double precision</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>OffestCurve</p></td>
+<td><div class="line-block">
+<div class="line">OffsetCurve( geom Curve , radius</div>
+<div class="line-block">
+<div class="line">Double precision ) :Curve</div>
+</div>
+</div>
+</td>
+<td rowspan="2"><div class="line-block">
+<div class="line">偏移曲线</div>
+<div class="line">正左负右</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_OffsetCurve( geom Curve ,</div>
+<div class="line">radius Double precision): Curve</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>Snap</p></td>
+<td><div class="line-block">
+<div class="line">Snap( geom1 Geometry , geom2 Geometry , tolerance</div>
+<div class="line">Double precision ) : Geometry</div>
+</div>
+</td>
+<td rowspan="2"><p>咬合1到2</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_Snap( geom1 Geometry , geom2 Geometry , tolerance</div>
+<div class="line">Double precision ) : Geometry</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 66%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Syntax</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td rowspan="2"><div class="line-block">
+<div class="line">Dissolve</div>
+<div class="line">Segments</div>
+</div>
+</td>
+<td><p>DissolveSegments( geom Geometry ) : Geometry</p></td>
+<td rowspan="2"><div class="line-block">
+<div class="line">溶合线段</div>
+<div class="line">点不会动</div>
+<div class="line">环被拆分</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>ST_DissolveSegments( geom Geometry ) : Geometry</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><div class="line-block">
+<div class="line">Delaunay</div>
+<div class="line">Triangulation</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">DelaunayTriangulation( geom Geometry [ , edges_only</div>
+<div class="line">Boolean [ , tolerance Double precision ]]) : Geometry</div>
+</div>
+</td>
+<td rowspan="2"><p>德拉尼三角网</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_DelaunayTriangulation( geom Geometry [, edges_only</div>
+<div class="line">Boolean [ , tolerance Double precision ] ]): Geometry</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>VoronojDiagram</p></td>
+<td><div class="line-block">
+<div class="line">VoronojDiagram( geom Geometry [, edges_only Boolean [</div>
+<div class="line">, frame_extra_size Double precision [ , tolerance</div>
+<div class="line">Double precision ] ] ] ) : Geometry</div>
+</div>
+</td>
+<td rowspan="2"><p>Voronoj图</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_VoronojDiagram( geom Geometry[, edges_only Boolean</div>
+<div class="line">[ , frame_extra_size Double precision [ , tolerance</div>
+<div class="line">Double precision ] ] ] ) : Geometry</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>ConvexHull</p></td>
+<td><p>ConvexHull( geom Geometry ) : Geometry</p></td>
+<td rowspan="2"><p>凸包</p></td>
+</tr>
+<tr class="row-odd"><td><p>ST_ConvexHull( geom Geometry ) : Geometry</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>ConcaveHull</p></td>
+<td><div class="line-block">
+<div class="line">ConcaveHull( geom Geometry [, factor Double precision</div>
+<div class="line">[ , allow_holes Boolean [, tolerance Double precision</div>
+<div class="line">] ] ] ) : Geometry</div>
+</div>
+</td>
+<td rowspan="2"><p>凹包</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">ST_ConcaveHull( geom Geometry [ , factor Double</div>
+<div class="line">precision [, allow_holes Boolean [ , tolerance Double</div>
+<div class="line">precision ] ] ] ) : Geometry</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

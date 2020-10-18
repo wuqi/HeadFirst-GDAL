@@ -1,0 +1,839 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GDALWarp &mdash; headfirst gdal 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+    <link rel="canonical" href="hiw1hhggdal-warp-api-tutorial.html"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="静态编译" href="static-build.html" />
+    <link rel="prev" title="GDAL Cheat Sheet" href="gdal-cheat-sheet.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> headfirst gdal
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preface.html">前言</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">影像是什么</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-data-model.html">GDAL数据模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read-and-write.html">栅格数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-utilities.html">GDAL工具集</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-tool-code.html">GDAL工具集代码实现(C/C++)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-alg.html">GDAL算法简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdal-cheat-sheet.html">GDAL Cheat Sheet</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GDALWarp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">GDALWarp简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gdalwarpoptions">GDALWarpOptions选项介绍</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">几何变换函数简介</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id8">完整流程</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id9">创建输出文件</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">设置选项</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">执行变换</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">清理环境</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">完整代码</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#optimization">性能优化</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="static-build.html">静态编译</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-architecture.html">OGR矢量结构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-proj.html">OGR投影简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-read-write.html">矢量数据读写</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-sql.html">OGR SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sqlite-sql.html">SQLite SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ogr-utilities.html">OGR工具集</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">headfirst gdal</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>GDALWarp</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/gdal-warp-api-tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gdalwarp">
+<span id="id1"></span><h1>GDALWarp<a class="headerlink" href="#gdalwarp" title="Permalink to this headline">¶</a></h1>
+<p>本章来源：</p>
+<ul class="simple">
+<li><a class="reference external" href="http://blog.csdn.net/liminlu0314/article/details/7603162">GDAL源码剖析（十二）之GDAL Warp API使用说明</a></li>
+<li><a class="reference external" href="http://www.gdal.org/structGDALWarpOptions.html#abf726bf4ef0927713370722ee34c6cc4">GDALWarpOptions Struct Reference</a></li>
+<li><a class="reference external" href="http://www.gdal.org/gdal__alg_8h.html">GDAL_Algorithms_C_API</a></li>
+</ul>
+<p>顺序重新调整,增加GDAL算法介绍，本章是进阶章节，阅读前请务必先熟悉 <a class="reference internal" href="gdal-data-model.html#gdaldatamodel"><span class="std std-ref">GDAL数据模型</span></a> 与 <a class="reference internal" href="read-and-write.html#read-write"><span class="std std-ref">栅格数据读写</span></a> 章节。</p>
+<div class="section" id="id2">
+<h2>GDALWarp简介<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>GDAL Warp API（在文件 <code class="docutils literal"><span class="pre">gdalwarper.h</span></code> 中定义）是一个高效的进行图像变换的接口。主要由几何变换函数（ <code class="docutils literal"><span class="pre">GDALTransformerFunc</span></code> ），多种图像重采样方式，掩码操作选项等组成。这个接口可以对很大的图像进行处理。</p>
+<p>使用步骤如下：</p>
+<ul class="simple">
+<li>在程序中，首先要初始化一个 <code class="docutils literal"><span class="pre">GDALWarpOptions</span></code>  结构体的对象</li>
+<li>然后使用 <code class="docutils literal"><span class="pre">GDALWarpOptions</span></code> 的对象来初始化 <code class="docutils literal"><span class="pre">GDALWarpOperation</span></code> 的对象</li>
+<li>最后通过调用 <code class="docutils literal"><span class="pre">GDALWarpKernel</span></code> 类里面的 <code class="docutils literal"><span class="pre">GDALWarpOperation::ChunkAndWarpImage()</span></code> 或  <code class="docutils literal"><span class="pre">GDALWarpOperation::ChunkAndWarpMulti()</span></code> 函数来完成图像的变换</li>
+</ul>
+<p>下面先介绍 <code class="docutils literal"><span class="pre">GDALWarpOptions</span></code> 和 <code class="docutils literal"><span class="pre">GDALTransformerFunc</span></code> ，然后对完整流程进行解析。</p>
+</div>
+<div class="section" id="gdalwarpoptions">
+<span id="id3"></span><h2>GDALWarpOptions选项介绍<a class="headerlink" href="#gdalwarpoptions" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">GDALWarpOptions</span></code> 是对图像变换进行设置的类，成员见下：</p>
+<dl class="class">
+<dt id="_CPPv215GDALWarpOptions">
+<span id="GDALWarpOptions"></span><em class="property">class </em><code class="descclassname"></code><code class="descname">GDALWarpOptions</code><a class="headerlink" href="#_CPPv215GDALWarpOptions" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>GDALWarpOptions结构体中包含了很多参数来对变换进行设置。下面对一些比较重要的进行列举说明：</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv216papszWarpOptions">
+<span id="papszWarpOptions__cPP"></span>char **<code class="descclassname"></code><code class="descname">papszWarpOptions</code><a class="headerlink" href="#_CPPv216papszWarpOptions" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>这个是一个字符串列表，用来设置图像变换过程中的一些选项，样式为 <code class="docutils literal"><span class="pre">NAME=VALUE</span></code> , 可以使用 <code class="docutils literal"><span class="pre">CSLSetNameValue()</span></code> 设置。现在支持的一些键值对设置为：</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">INIT_DEST=[value]</span></code> 或者 <code class="docutils literal"><span class="pre">INIT_DEST=NO_DATA</span></code> ：这个选项用来强制设置结果图像的初始值（所有的波段），初始值为指定的value，或者NODATA值。NODATA值从参数padfDstNoDataReal或者参数padfDstNoDataImag中获取。如果这个值没有设置，那么将会使用原始图像的NODATA值来覆盖。</li>
+<li><code class="docutils literal"><span class="pre">WRITE_FLUSH=YES/NO</span></code> ：这个选项用来强制设置在处理完每一块后将数据写入磁盘中。在某些时候，这个选项可以更加安全的写入结果数据，但是同时会增加更多的磁盘操作。目前这个默认值为NO。</li>
+<li><code class="docutils literal"><span class="pre">SKIP_NOSOURCE=YES/NO</span></code> :跳过没有相应输入的数据块的处理。这将禁止初始化要写入的数据块以及其他所有处理，要谨慎使用。常用于影像拼接、镶嵌情况下，减少额外工作。</li>
+<li><code class="docutils literal"><span class="pre">UNIFIED_SRC_NODATA=YES/[NO]</span></code> :默认情况下，每个波段的 <code class="docutils literal"><span class="pre">nodata</span></code> 掩膜数据是独立的。但有些时候所有波段的 <code class="docutils literal"><span class="pre">nodata</span></code> 值一致情况下，可以将此参数设置为YES。</li>
+</ul>
+<p>通常在计算一个数据的部分区域时，变换样区在输出区域每个边界上转换21个点到源文件中，然后在源图中计算一个足够大的窗口。这样做是为了使转换更加高效，但某些情况下，这种做法计算的窗口过小，甚至丢失大量的区域。特别是对于非线性或者是翻转的转换。例如对极地点附近的区域，从WGS84转到Polar Stereographic投影转换，或者某些根本无法进行投影转换的数据。对于这种情况，GDAL提供以下键值对设置来防止窗口计算错误：</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">SAMPLE_GRID=YES/NO</span></code> : 如果设置为 <code class="docutils literal"><span class="pre">YES</span></code> ,将强制采样样区边缘点和中心点。对于变形很大的投影或者是大部分数据变换后不在源图像上的情况非常适用。</li>
+<li><code class="docutils literal"><span class="pre">SAMPLE_STEPS</span></code> : 调整采样密度，默认为21，增加可以增强精确度，但是会降低计算效率。</li>
+<li><code class="docutils literal"><span class="pre">SOURCE_EXTRA</span></code> : 该数值是边界增加的像素，默认为1，保证边界不出错，设置更大的画，将增加读取数量，但是可以避免丢失源数据。</li>
+<li><code class="docutils literal"><span class="pre">CUTLINE</span></code> : 裁切线，使用wkt表示。与在 <code class="docutils literal"><span class="pre">GDALWarpOptions</span> <span class="pre">hCutline</span></code> 中设置相同，在 <code class="docutils literal"><span class="pre">GDALWarpOperation::Initialize()</span></code>  调用时将被设置到 <code class="docutils literal"><span class="pre">hCutline</span></code> 属性中。与  <code class="docutils literal"><span class="pre">gdalwarp</span></code> 工具不同，坐标系为图像的坐标系。</li>
+<li><code class="docutils literal"><span class="pre">CUTLINE_BLEND_DIST</span></code> : 与 <code class="docutils literal"><span class="pre">dfCutlineBlendDist</span></code> 属性相同</li>
+<li><code class="docutils literal"><span class="pre">CUTLINE_ALL_TOUCHED</span></code> : 默认为  <code class="docutils literal"><span class="pre">FALSE</span></code>  ，但是可以设置为  <code class="docutils literal"><span class="pre">TURE</span></code> ，保证与裁切线相交的像素会被裁剪，而不仅仅是完全被包含的像素。</li>
+<li><code class="docutils literal"><span class="pre">OPTIMIZE_SIZE</span></code> : 默认为  <code class="docutils literal"><span class="pre">FALSE</span></code>  ，设置为  <code class="docutils literal"><span class="pre">TRUE</span></code> 时，在压缩格式中将获取更小的文件，可能导致转换变慢。</li>
+<li><code class="docutils literal"><span class="pre">NUM_THREADS</span></code> : (GDAL &gt;= 1.10) 设置为一个数值，或者是 <code class="docutils literal"><span class="pre">ALL_CPUS</span></code> 可以设置多线程，使用并行化处理图像变换。没有设置默认为单线程。</li>
+</ul>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv217dfWarpMemoryLimit">
+<span id="dfWarpMemoryLimit__double"></span>double <code class="descclassname"></code><code class="descname">dfWarpMemoryLimit</code><a class="headerlink" href="#_CPPv217dfWarpMemoryLimit" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>设置GDALWarpOperation在处理图像中使用的最大内存数。单位为比特，默认值比较保守（比较小），可以根据自己的内存大小来进行调整这个值。增加这个值可以帮助提高程序的运行效率，但是需要注意内存的大小。这个大小、GDAL的缓存大小，还有你的应用程序以及系统所需要的内存加起来要小于系统的内存，否则会导致错误。一般来说，比如一个内存为256MB的系统，这个值最少设置为64MB比较合理。注意，这个值不包括GDAL读取数据使用的内存。</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv212eResampleAlg">
+<span id="eResampleAlg__GDALResampleAlg"></span>GDALResampleAlg <code class="descclassname"></code><code class="descname">eResampleAlg</code><a class="headerlink" href="#_CPPv212eResampleAlg" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>重采样的算法选择：</p>
+<ul class="simple">
+<li>GRA_NearestNeighbour ：最邻近插值</li>
+<li>GRA_Bilinear ：双线性插值 (2x2 kernel)</li>
+<li>GRA_Cubic ：立方卷积逼近 (4x4 kernel)</li>
+<li>GRA_CubicSpline：三次样条线逼近(4x4 kernel)</li>
+<li>GRA_Lanczos ：Lanczos windowed sinc 插值 (6x6 kernel)</li>
+<li>GRA_Average ：均值 (计算样区内非空值的所有像素均值)</li>
+<li>GRA_Mode ：众数 (出现频数最高的值)</li>
+</ul>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv216eWorkingDataType">
+<span id="eWorkingDataType__GDALDataType"></span>GDALDataType <code class="descclassname"></code><code class="descname">eWorkingDataType</code><a class="headerlink" href="#_CPPv216eWorkingDataType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>计算时用的数据类型，GDT_Unknown 为程序自动判断</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv26hSrcDS">
+<span id="hSrcDS__GDALDatasetH"></span>GDALDatasetH <code class="descclassname"></code><code class="descname">hSrcDS</code><a class="headerlink" href="#_CPPv26hSrcDS" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>源数据集</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv26hDstDS">
+<span id="hDstDS__GDALDatasetH"></span>GDALDatasetH <code class="descclassname"></code><code class="descname">hDstDS</code><a class="headerlink" href="#_CPPv26hDstDS" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>目标数据集</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv210nBandCount">
+<span id="nBandCount__i"></span>int <code class="descclassname"></code><code class="descname">nBandCount</code><a class="headerlink" href="#_CPPv210nBandCount" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>所需转换的波段数，0为所有波段</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv211panSrcBands">
+<span id="panSrcBands__iP"></span>int *<code class="descclassname"></code><code class="descname">panSrcBands</code><a class="headerlink" href="#_CPPv211panSrcBands" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>int数组，源图像中所需处理的波段，从1开始</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv211panDstBands">
+<span id="panDstBands__iP"></span>int *<code class="descclassname"></code><code class="descname">panDstBands</code><a class="headerlink" href="#_CPPv211panDstBands" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>int数组，输出的波段</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv213nSrcAlphaBand">
+<span id="nSrcAlphaBand__i"></span>int <code class="descclassname"></code><code class="descname">nSrcAlphaBand</code><a class="headerlink" href="#_CPPv213nSrcAlphaBand" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>源数据中的Alpha波段，0为禁止</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv213nDstAlphaBand">
+<span id="nDstAlphaBand__i"></span>int <code class="descclassname"></code><code class="descname">nDstAlphaBand</code><a class="headerlink" href="#_CPPv213nDstAlphaBand" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>目标数据中的Alpha波段，0为禁止</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv217padfSrcNoDataReal">
+<span id="padfSrcNoDataReal__doubleP"></span>double *<code class="descclassname"></code><code class="descname">padfSrcNoDataReal</code><a class="headerlink" href="#_CPPv217padfSrcNoDataReal" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>源数据中 nodata 的实部，NULL表示没有</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv217padfSrcNoDataImag">
+<span id="padfSrcNoDataImag__doubleP"></span>double *<code class="descclassname"></code><code class="descname">padfSrcNoDataImag</code><a class="headerlink" href="#_CPPv217padfSrcNoDataImag" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>源数据中 nodata 的虚部，NULL表示没有</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv217padfDstNoDataReal">
+<span id="padfDstNoDataReal__doubleP"></span>double *<code class="descclassname"></code><code class="descname">padfDstNoDataReal</code><a class="headerlink" href="#_CPPv217padfDstNoDataReal" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>目标数据中 nodata 的实部，NULL表示没有</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv217padfDstNoDataImag">
+<span id="padfDstNoDataImag__doubleP"></span>double *<code class="descclassname"></code><code class="descname">padfDstNoDataImag</code><a class="headerlink" href="#_CPPv217padfDstNoDataImag" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>目标数据中 nodata 的虚部，NULL表示没有</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv211pfnProgress">
+<span id="pfnProgress__GDALProgressFunc"></span>GDALProgressFunc <code class="descclassname"></code><code class="descname">pfnProgress</code><a class="headerlink" href="#_CPPv211pfnProgress" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>进度条显示函数，NULL表示没有</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv212pProgressArg">
+<span id="pProgressArg__voidP"></span>void *<code class="descclassname"></code><code class="descname">pProgressArg</code><a class="headerlink" href="#_CPPv212pProgressArg" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>传给pfnProgress的回调参数</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv214pfnTransformer">
+<span id="pfnTransformer__GDALTransformerFunc"></span>GDALTransformerFunc <code class="descclassname"></code><code class="descname">pfnTransformer</code><a class="headerlink" href="#_CPPv214pfnTransformer" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>几何变换函数</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv215pTransformerArg">
+<span id="pTransformerArg__voidP"></span>void *<code class="descclassname"></code><code class="descname">pTransformerArg</code><a class="headerlink" href="#_CPPv215pTransformerArg" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>几何变换函数参数</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv28hCutline">
+<span id="hCutline__voidP"></span>void *<code class="descclassname"></code><code class="descname">hCutline</code><a class="headerlink" href="#_CPPv28hCutline" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>裁切线，OGRPolygonH 类型</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv218dfCutlineBlendDist">
+<span id="dfCutlineBlendDist__double"></span>double <code class="descclassname"></code><code class="descname">dfCutlineBlendDist</code><a class="headerlink" href="#_CPPv218dfCutlineBlendDist" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>切割线宽容度，默认为零</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h2>几何变换函数简介<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://www.gdal.org/gdal__alg_8h.html#a7df61123fec15deb3da3acabce19e647">GDALTransformerFunc</a>  是一个函数签名，用来计算空间点几何变换，也是 <code class="docutils literal"><span class="pre">GDALWarp</span></code> 的核心部分，定义在GDAL算法文件中。 <code class="docutils literal"><span class="pre">GDAL</span></code> 中可用的算法有：</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">GDALApproxTransform</span></code>  近似变换</li>
+<li><code class="docutils literal"><span class="pre">GDALGCPTransform</span></code> GCP投影变换</li>
+<li><code class="docutils literal"><span class="pre">GDALGenImgProjTransform</span></code> 图像几何变换</li>
+<li><code class="docutils literal"><span class="pre">GDALReprojectionTransform</span></code> 重投影变换</li>
+<li><code class="docutils literal"><span class="pre">GDALTPSTransform</span></code> TPS变换</li>
+<li><code class="docutils literal"><span class="pre">GDALRPCTransform</span></code> <a class="reference external" href="http://trac.osgeo.org/gdal/wiki/rfc22_rpc">RPC</a> 变换</li>
+<li><code class="docutils literal"><span class="pre">GDALGeoLocTransform</span></code> <a class="reference external" href="http://trac.osgeo.org/gdal/wiki/rfc4_geolocate">GeoLoc</a> 变换</li>
+</ul>
+<p>与 <code class="docutils literal"><span class="pre">GDALTransformerFunc</span></code> 对应，默认有几个函数生成几何变换函数参数：</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">GDALCreateApproxTransformer</span></code> 对应生成近似变换参数</li>
+<li><code class="docutils literal"><span class="pre">GDALCreateGCPTransformer</span></code> 对应生成GCP投影变换参数</li>
+<li><code class="docutils literal"><span class="pre">GDALCreateGenImgProjTransformer</span></code>  对应生成图像几何变换参数</li>
+<li><code class="docutils literal"><span class="pre">GDALCreateGenImgProjTransformer2</span></code>  对应生成图像几何变换参数</li>
+<li><code class="docutils literal"><span class="pre">GDALCreateGenImgProjTransformer3</span></code>  对应生成图像几何变换参数</li>
+<li><code class="docutils literal"><span class="pre">GDALCreateReprojectionTransformer</span></code> 对应生成重投影变换参数</li>
+<li><code class="docutils literal"><span class="pre">GDALCreateTPSTransformer</span></code> 对应生成TPS变换参数</li>
+<li><code class="docutils literal"><span class="pre">GDALCreateRPCTransformer</span></code> 对应生成  <a class="reference external" href="http://trac.osgeo.org/gdal/wiki/rfc22_rpc">RPC</a> 变换投影变换参数</li>
+<li><code class="docutils literal"><span class="pre">GDALCreateGeoLocTransformer</span></code> 对应生成 <a class="reference external" href="http://trac.osgeo.org/gdal/wiki/rfc4_geolocate">GeoLoc</a> 投影变换参数</li>
+</ul>
+<p>这部分看起来比较复杂，实际使用时，比较简便。只需要在 <code class="docutils literal"><span class="pre">GDALWarpOptions-&gt;pfnTransformer</span></code> 中指定算法名称， <code class="docutils literal"><span class="pre">GDALWarpOptions-&gt;pTransformerArg</span></code> 中指定对应的算法参数函数即可，如下代码所示：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">pfnTransformer</span> <span class="o">=</span> <span class="n">GDALGenImgProjTransform</span><span class="p">;</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">pTransformerArg</span> <span class="o">=</span>
+    <span class="n">GDALCreateGenImgProjTransformer</span><span class="p">(</span><span class="n">pSrcDs</span><span class="p">,</span>
+                                    <span class="n">sFromWkt</span><span class="p">,</span>
+                                    <span class="n">pDstDs</span><span class="p">,</span>
+                                    <span class="n">sToWkt</span><span class="p">,</span>
+                                    <span class="n">FALSE</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>每个Transformer的所需参数不同，请参见 <a class="reference external" href="http://www.gdal.org/gdal__alg_8h.html#a7671696d085085a0bfba3c3df9ffcc0a">GDAL Algorithms C API</a> ，近似计算有些特殊，在使用Transformer时要传递几何变换函数，参考 <a class="reference internal" href="#optimization"><span class="std std-ref">性能优化</span></a> 部分最后一条。</p>
+</div>
+<div class="section" id="id8">
+<h2>完整流程<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>下面介绍使用 <code class="docutils literal"><span class="pre">GDALWarp</span></code> 提供的接口，实现几何变换的完整流程：</p>
+<div class="section" id="id9">
+<h3>创建输出文件<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>几何变换后输出文件的范围和投影仿射参数都将发生变化，输出的文件大小可能是已知，也可能是未知的。因此创建输出文件方式也有两种：</p>
+<ul class="simple">
+<li>已知的例如重采样或者裁剪，我们知道输出文件大小，需要自己计算文件大小</li>
+<li>未知例如投影，我们GDAL中提供计算函数，我们将使用 <code class="docutils literal"><span class="pre">GDALSuggestedWarpOutput</span></code> 函数预测输出文件大小和仿射变换，使用 <code class="docutils literal"><span class="pre">GDALDriver-&gt;Create()</span></code> 函数创建输出文件</li>
+</ul>
+<p>重采样创建文件示例：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="c1">//打开输入文件</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">pDSrc</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span><span class="n">GDALOpen</span><span class="p">(</span><span class="n">InFile</span><span class="p">,</span> <span class="n">GA_ReadOnly</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="n">pDSrc</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//创建Driver</span>
+<span class="n">GDALDriver</span> <span class="o">*</span><span class="n">pDriver</span> <span class="o">=</span> <span class="n">GetGDALDriverManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="s">&quot;GTiff&quot;</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="n">pDriver</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">GDALClose</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDSrc</span><span class="p">);</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//获取源数据中的投影/波段数/仿射变换等信息</span>
+<span class="kt">int</span> <span class="n">inBandCount</span> <span class="o">=</span> <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetRasterCount</span><span class="p">();</span>
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">strWkt</span> <span class="o">=</span> <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetProjectionRef</span><span class="p">();</span>
+<span class="n">GDALDataType</span> <span class="n">dataType</span> <span class="o">=</span> <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">GetRasterDataType</span><span class="p">();</span>
+<span class="kt">double</span> <span class="n">geos</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+<span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetGeoTransform</span><span class="p">(</span><span class="n">geos</span><span class="p">);</span>
+<span class="c1">//获取源数据中左上角点地理坐标Img2CoordX/Img2CoordY为图片到投影坐标转换函数</span>
+<span class="kt">double</span> <span class="n">lefttopx</span> <span class="o">=</span> <span class="n">Img2CoordX</span><span class="p">(</span><span class="n">geos</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+<span class="kt">double</span> <span class="n">lefttopy</span> <span class="o">=</span> <span class="n">Img2CoordY</span><span class="p">(</span><span class="n">geos</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+<span class="c1">//计算新高度和宽度,以及投影信息</span>
+<span class="kt">int</span> <span class="n">newWidth</span> <span class="o">=</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetRasterXSize</span><span class="p">()</span><span class="o">*</span><span class="n">geos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">fResX</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">newHeight</span> <span class="o">=</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="n">fabs</span><span class="p">(</span><span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetRasterYSize</span><span class="p">()</span><span class="o">*</span><span class="n">geos</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">/</span><span class="n">fResY</span><span class="p">);</span>
+<span class="n">geos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lefttopx</span><span class="p">;</span>
+<span class="n">geos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fResX</span><span class="p">;</span>
+<span class="n">geos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">lefttopy</span><span class="p">;</span>
+<span class="n">geos</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">fResY</span><span class="p">;</span>
+<span class="kt">int</span> <span class="o">*</span><span class="n">pSrcBand</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="kt">int</span> <span class="o">*</span><span class="n">pDstBand</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">iBandSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="c1">//创建输出文件</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">pDDst</span> <span class="o">=</span> <span class="n">pDriver</span><span class="o">-&gt;</span><span class="n">Create</span><span class="p">(</span><span class="n">OutFile</span><span class="p">,</span>
+                                     <span class="n">newWidth</span><span class="p">,</span>
+                                     <span class="n">newHeight</span><span class="p">,</span>
+                                     <span class="n">iBandSize</span><span class="p">,</span>
+                                     <span class="n">dataType</span><span class="p">,</span>
+                                     <span class="nb">NULL</span><span class="p">);</span>
+<span class="n">pDDst</span><span class="o">-&gt;</span><span class="n">SetProjection</span><span class="p">(</span><span class="n">strWkt</span><span class="p">);</span>
+<span class="n">pDDst</span><span class="o">-&gt;</span><span class="n">SetGeoTransform</span><span class="p">(</span><span class="n">geos</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>投影变换创建文件示例：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//打开文件</span>
+<span class="n">GDALAllRegister</span><span class="p">();</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">pProjDS</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span><span class="n">GDALOpen</span><span class="p">(</span><span class="n">ProjFile</span><span class="p">,</span> <span class="n">GA_ReadOnly</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="n">pProjDS</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="p">;</span>   <span class="c1">//打开坐标文件失败</span>
+<span class="p">}</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">sToWkt</span> <span class="o">=</span> <span class="p">...</span><span class="c1">//输出的投影</span>
+
+<span class="c1">//输出文件</span>
+<span class="n">GDALDataset</span> <span class="o">*</span><span class="n">pDstDs</span><span class="p">;</span>
+<span class="c1">//创建Driver</span>
+<span class="n">GDALDriver</span><span class="o">*</span> <span class="n">pDriver</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDriver</span><span class="o">*</span><span class="p">)</span><span class="n">GDALGetDriverByName</span><span class="p">(</span><span class="s">&quot;GTiff&quot;</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="n">pDriver</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">3</span><span class="p">;</span>   <span class="c1">//注册driver失败</span>
+<span class="p">}</span>
+
+<span class="c1">//计算输出投影参数</span>
+
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">sFromWkt</span> <span class="o">=</span> <span class="n">GDALGetProjectionRef</span><span class="p">(</span><span class="n">pProjDS</span><span class="p">);</span>
+<span class="n">CPLAssert</span><span class="p">(</span><span class="n">sFromWkt</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span><span class="n">strlen</span><span class="p">(</span><span class="n">sFromWkt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+
+<span class="c1">//计算变换参数</span>
+<span class="kt">void</span> <span class="o">*</span><span class="n">pTransformArg</span><span class="p">;</span>
+<span class="n">pTransformArg</span> <span class="o">=</span> <span class="n">GDALCreateGenImgProjTransformer</span><span class="p">(</span><span class="n">pProjDS</span><span class="p">,</span>
+                                                <span class="n">sFromWkt</span><span class="p">,</span>
+                                                <span class="nb">NULL</span><span class="p">,</span>
+                                                <span class="n">sToWkt</span><span class="p">,</span>
+                                                <span class="n">FALSE</span><span class="p">,</span>
+                                                <span class="mi">0</span><span class="p">,</span>
+                                                <span class="mi">3</span><span class="p">);</span>
+<span class="n">CPLAssert</span><span class="p">(</span><span class="n">pTransformArg</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="kt">double</span> <span class="n">geos</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span>
+<span class="kt">int</span> <span class="n">nPixels</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nLines</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+<span class="n">CPLErr</span> <span class="n">eErr</span><span class="p">;</span>
+<span class="n">eErr</span> <span class="o">=</span> <span class="n">GDALSuggestedWarpOutput</span><span class="p">(</span><span class="n">pProjDS</span><span class="p">,</span>
+                               <span class="n">GDALGenImgProjTransform</span><span class="p">,</span>
+                               <span class="n">pTransformArg</span><span class="p">,</span>
+                               <span class="n">geos</span><span class="p">,</span>
+                               <span class="o">&amp;</span><span class="n">nPixels</span><span class="p">,</span>
+                               <span class="o">&amp;</span><span class="n">nLines</span><span class="p">);</span>
+<span class="n">CPLAssert</span><span class="p">(</span><span class="n">eErr</span> <span class="o">==</span> <span class="n">CE_None</span><span class="p">);</span>
+<span class="n">GDALDestroyGenImgProjTransformer</span><span class="p">(</span><span class="n">pTransformArg</span><span class="p">);</span>
+<span class="c1">//输出数据类型</span>
+<span class="n">GDALDataType</span> <span class="n">eDataType</span><span class="o">=</span> <span class="n">GDALGetRasterDataType</span><span class="p">(</span><span class="n">GDALGetRasterBand</span><span class="p">(</span><span class="n">pProjDS</span><span class="p">,</span><span class="mi">1</span><span class="p">));</span>
+<span class="c1">//计算创建波段数量</span>
+<span class="kt">int</span> <span class="n">nCreateBandCount</span> <span class="o">=</span> <span class="n">pProjDS</span><span class="o">-&gt;</span><span class="n">GetRasterCount</span><span class="p">();</span>
+
+<span class="c1">//创建文件</span>
+<span class="n">pDstDs</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span><span class="o">*</span><span class="p">)</span><span class="n">GDALCreate</span><span class="p">(</span><span class="n">pDriver</span><span class="p">,</span>
+                                  <span class="n">sOutFileName</span><span class="p">,</span>
+                                  <span class="n">nPixels</span><span class="p">,</span>
+                                  <span class="n">nLines</span><span class="p">,</span>
+                                  <span class="n">nCreateBandCount</span><span class="p">,</span>
+                                  <span class="n">eDataType</span><span class="p">,</span>
+                                  <span class="nb">NULL</span><span class="p">);</span>
+<span class="n">GDALSetProjection</span><span class="p">(</span><span class="n">pDstDs</span><span class="p">,</span> <span class="n">sToWkt</span><span class="p">);</span>
+<span class="n">GDALSetGeoTransform</span><span class="p">(</span><span class="n">pDstDs</span><span class="p">,</span> <span class="n">geos</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id10">
+<h3>设置选项<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>选项设置参见 <a class="reference internal" href="#gdalwarpoptions"><span class="std std-ref">GDALWarpOptions选项介绍</span></a> ，设置一般需要设置输入输出数据集，需要操作的波段，几何变换函数和参数，进度条，优化参数这几项。示例如下：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//warp 选项</span>
+<span class="n">GDALWarpOptions</span> <span class="o">*</span><span class="n">psWarpOptions</span> <span class="o">=</span> <span class="n">GDALCreateWarpOptions</span><span class="p">();</span>
+<span class="c1">//源</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">hSrcDS</span> <span class="o">=</span> <span class="n">pSrcDs</span><span class="p">;</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">hDstDS</span> <span class="o">=</span> <span class="n">pDstDs</span><span class="p">;</span>
+<span class="c1">//优化选项</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">dfWarpMemoryLimit</span> <span class="o">=</span> <span class="mi">512000000</span><span class="p">;</span>
+<span class="kt">char</span><span class="o">**</span> <span class="n">papszWarpOptions</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
+<span class="n">papszWarpOptions</span> <span class="o">=</span> <span class="n">CSLSetNameValue</span><span class="p">(</span><span class="n">papszWarpOptions</span><span class="p">,</span><span class="s">&quot;NUM_THREADS&quot;</span><span class="p">,</span><span class="s">&quot;ALL_CPUS&quot;</span><span class="p">);</span>
+<span class="n">papszWarpOptions</span> <span class="o">=</span> <span class="n">CSLSetNameValue</span><span class="p">(</span><span class="n">papszWarpOptions</span><span class="p">,</span><span class="s">&quot;WRITE_FLUSH&quot;</span><span class="p">,</span><span class="s">&quot;YES&quot;</span><span class="p">);</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">papszWarpOptions</span><span class="o">=</span><span class="n">papszWarpOptions</span><span class="p">;</span>
+<span class="c1">//源和输出对应的波段</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">nBandCount</span> <span class="o">=</span> <span class="n">nCreateBandCount</span><span class="p">;</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">panSrcBands</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)</span> <span class="n">CPLMalloc</span><span class="p">(</span><span class="n">nCreateBandCount</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">panDstBands</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)</span> <span class="n">CPLMalloc</span><span class="p">(</span><span class="n">nCreateBandCount</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+<span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">nCreateBandCount</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">panSrcBands</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pSrcBand</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">panDstBands</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pDstBand</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="k">delete</span><span class="p">[]</span> <span class="n">pSrcBand</span><span class="p">;</span>
+<span class="k">delete</span><span class="p">[]</span> <span class="n">pDstBand</span><span class="p">;</span>
+<span class="c1">//进度条</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">pfnProgress</span> <span class="o">=</span> <span class="n">GDALTermProgress</span><span class="p">;</span>
+<span class="c1">// 几何变换函数和参数</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">pfnTransformer</span> <span class="o">=</span> <span class="n">GDALGenImgProjTransform</span><span class="p">;</span>
+<span class="n">psWarpOptions</span><span class="o">-&gt;</span><span class="n">pTransformerArg</span> <span class="o">=</span>
+    <span class="n">GDALCreateGenImgProjTransformer</span><span class="p">(</span><span class="n">pSrcDs</span><span class="p">,</span>
+                                    <span class="n">sFromWkt</span><span class="p">,</span>
+                                    <span class="n">pDstDs</span><span class="p">,</span>
+                                    <span class="n">sToWkt</span><span class="p">,</span>
+                                    <span class="n">FALSE</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id11">
+<h3>执行变换<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>执行较为简单，新建 <code class="docutils literal"><span class="pre">GDALWarpOperation</span></code> ,调用 <code class="docutils literal"><span class="pre">Initialize</span></code> 函数，然后调用 <code class="docutils literal"><span class="pre">ChunkAndWarpMulti</span></code> 或者 <code class="docutils literal"><span class="pre">ChunkAndWarpImage</span></code> ，代码一般如下：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALWarpOperation</span> <span class="n">opt</span><span class="p">;</span>
+<span class="k">if</span><span class="p">(</span><span class="n">opt</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">psWarpOptions</span><span class="p">)</span><span class="o">!=</span><span class="n">CE_None</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">GDALClose</span><span class="p">(</span><span class="n">pSrcDs</span><span class="p">);</span>
+    <span class="n">GDALClose</span><span class="p">(</span><span class="n">outDs</span><span class="p">);</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">opt</span><span class="p">.</span><span class="n">ChunkAndWarpMulti</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">CutWidth</span><span class="p">,</span> <span class="n">CutHeight</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h3>清理环境<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>完成后，需要释放变换参数、删除数据集。代码如下：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALDestroyGenImgProjTransformer</span><span class="p">(</span><span class="n">psWo</span><span class="o">-&gt;</span><span class="n">pTransformerArg</span><span class="p">);</span>
+<span class="n">GDALDestroyWarpOptions</span><span class="p">(</span><span class="n">psWo</span><span class="p">);</span>
+<span class="n">GDALClose</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDSrc</span><span class="p">);</span>
+<span class="n">GDALClose</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDDst</span><span class="p">);</span>
+<span class="k">delete</span><span class="p">[]</span> <span class="n">pSrcBand</span><span class="p">;</span>
+<span class="k">delete</span><span class="p">[]</span> <span class="n">pDstBand</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id13">
+<h3>完整代码<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>完整的重采样代码如下：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">图像坐标转地理坐标x</span>
+<span class="cm">    @param geos   变换参数</span>
+<span class="cm">    @param x      图像X坐标</span>
+<span class="cm">    @param y      图像Y坐标</span>
+<span class="cm">    @return       地理X坐标</span>
+<span class="cm"> */</span>
+<span class="kt">double</span> <span class="nf">Img2CoordX</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span> <span class="o">*</span><span class="n">geos</span><span class="p">,</span> <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="n">geos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">geos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">geos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">y</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cm">/**</span>
+<span class="cm">图像坐标转地理坐标y</span>
+<span class="cm">    @param geos   变换参数</span>
+<span class="cm">    @param x      图像X坐标</span>
+<span class="cm">    @param y      图像Y坐标</span>
+<span class="cm">    @return       地理Y坐标</span>
+<span class="cm"> */</span>
+<span class="kt">double</span> <span class="nf">Img2CoordY</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span> <span class="o">*</span><span class="n">geos</span><span class="p">,</span> <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="n">geos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">geos</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">geos</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">y</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm">    图像重采样</span>
+<span class="cm">    @param InFile       输入文件</span>
+<span class="cm">    @param OutFile      输出文件</span>
+<span class="cm">    @param fResX        x分辨率</span>
+<span class="cm">    @param fResY        Y分辨率</span>
+<span class="cm">    @param iResampleAlg 重采样方式,默认为2</span>
+<span class="cm">                            GRA_NearestNeighbour=0,</span>
+<span class="cm">                            GRA_Bilinear=1,</span>
+<span class="cm">                            GRA_Cubic=2,</span>
+<span class="cm">                            GRA_CubicSpline=3,</span>
+<span class="cm">                            GRA_Lanczos=4,</span>
+<span class="cm">                            GRA_Average=5,</span>
+<span class="cm">                            GRA_Mode=6</span>
+<span class="cm">    @param pBandIndex   重采样的波段，默认为NULL，全部波段重采样</span>
+<span class="cm">    @param pnBandCount   重采样波段总数，默认为0 ，全部波段重采样</span>
+<span class="cm">*/</span>
+<span class="kt">int</span> <span class="nf">Resample</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">InFile</span> <span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">OutFile</span><span class="p">,</span> <span class="kt">float</span> <span class="n">fResX</span> <span class="p">,</span>
+             <span class="kt">float</span> <span class="n">fResY</span><span class="p">,</span> <span class="kt">int</span> <span class="n">iResampleAlg</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">pBandIndex</span><span class="p">,</span> <span class="kt">int</span> <span class="n">pnBandCount</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">GDALAllRegister</span><span class="p">();</span>
+  <span class="n">GDALResampleAlg</span> <span class="n">eResample</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALResampleAlg</span><span class="p">)</span><span class="n">iResampleAlg</span><span class="p">;</span>
+  <span class="c1">//打开文件</span>
+  <span class="n">GDALDataset</span> <span class="o">*</span><span class="n">pDSrc</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span> <span class="o">*</span><span class="p">)</span><span class="n">GDALOpen</span><span class="p">(</span><span class="n">InFile</span><span class="p">,</span> <span class="n">GA_ReadOnly</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">pDSrc</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">GDALDriver</span> <span class="o">*</span><span class="n">pDriver</span> <span class="o">=</span> <span class="n">GetGDALDriverManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="s">&quot;GTiff&quot;</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">pDriver</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">GDALClose</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDSrc</span><span class="p">);</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">//计算输出投影参数</span>
+  <span class="kt">int</span> <span class="n">inBandCount</span> <span class="o">=</span> <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetRasterCount</span><span class="p">();</span>
+  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">strWkt</span> <span class="o">=</span> <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetProjectionRef</span><span class="p">();</span>
+  <span class="n">GDALDataType</span> <span class="n">dataType</span> <span class="o">=</span> <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">GetRasterDataType</span><span class="p">();</span>
+  <span class="kt">double</span> <span class="n">geos</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+  <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetGeoTransform</span><span class="p">(</span><span class="n">geos</span><span class="p">);</span>
+  <span class="kt">double</span> <span class="n">lefttopx</span> <span class="o">=</span> <span class="n">Img2CoordX</span><span class="p">(</span><span class="n">geos</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="kt">double</span> <span class="n">lefttopy</span> <span class="o">=</span> <span class="n">Img2CoordY</span><span class="p">(</span><span class="n">geos</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="kt">int</span> <span class="n">newWidth</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetRasterXSize</span><span class="p">()</span> <span class="o">*</span> <span class="n">geos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">fResX</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">newHeight</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="n">fabs</span><span class="p">(</span><span class="n">pDSrc</span><span class="o">-&gt;</span><span class="n">GetRasterYSize</span><span class="p">()</span> <span class="o">*</span> <span class="n">geos</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">/</span> <span class="n">fResY</span><span class="p">);</span>
+  <span class="n">geos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lefttopx</span><span class="p">;</span>
+  <span class="n">geos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fResX</span><span class="p">;</span>
+  <span class="n">geos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">lefttopy</span><span class="p">;</span>
+  <span class="n">geos</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">fResY</span><span class="p">;</span>
+  <span class="c1">//输入输出波段对应</span>
+  <span class="kt">int</span> <span class="o">*</span><span class="n">pSrcBand</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="o">*</span><span class="n">pDstBand</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">iBandSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">pBandIndex</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">pnBandCount</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">iBandSize</span> <span class="o">=</span> <span class="n">pnBandCount</span><span class="p">;</span>
+    <span class="n">pSrcBand</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">[</span><span class="n">iBandSize</span><span class="p">];</span>
+    <span class="n">pDstBand</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">[</span><span class="n">iBandSize</span><span class="p">];</span>
+
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">iBandSize</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">pSrcBand</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pBandIndex</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+      <span class="n">pDstBand</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">iBandSize</span> <span class="o">=</span> <span class="n">inBandCount</span><span class="p">;</span>
+    <span class="n">pSrcBand</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">[</span><span class="n">iBandSize</span><span class="p">];</span>
+    <span class="n">pDstBand</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">[</span><span class="n">iBandSize</span><span class="p">];</span>
+
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">iBandSize</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">pSrcBand</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+      <span class="n">pDstBand</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="c1">//创建输出文件</span>
+  <span class="n">GDALDataset</span> <span class="o">*</span><span class="n">pDDst</span> <span class="o">=</span> <span class="n">pDriver</span><span class="o">-&gt;</span><span class="n">Create</span><span class="p">(</span><span class="n">OutFile</span><span class="p">,</span>
+                                       <span class="n">newWidth</span><span class="p">,</span>
+                                       <span class="n">newHeight</span><span class="p">,</span>
+                                       <span class="n">iBandSize</span><span class="p">,</span>
+                                       <span class="n">dataType</span><span class="p">,</span>
+                                       <span class="nb">NULL</span><span class="p">);</span>
+  <span class="n">pDDst</span><span class="o">-&gt;</span><span class="n">SetProjection</span><span class="p">(</span><span class="n">strWkt</span><span class="p">);</span>
+  <span class="n">pDDst</span><span class="o">-&gt;</span><span class="n">SetGeoTransform</span><span class="p">(</span><span class="n">geos</span><span class="p">);</span>
+  <span class="c1">//参数选项</span>
+  <span class="n">GDALWarpOptions</span> <span class="o">*</span><span class="n">psWo</span> <span class="o">=</span> <span class="n">GDALCreateWarpOptions</span><span class="p">();</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">papszWarpOptions</span> <span class="o">=</span> <span class="n">CSLDuplicate</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+  <span class="c1">//数据源</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">eWorkingDataType</span> <span class="o">=</span> <span class="n">dataType</span><span class="p">;</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">eResampleAlg</span> <span class="o">=</span> <span class="n">eResample</span><span class="p">;</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">hSrcDS</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDSrc</span><span class="p">;</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">hDstDS</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDDst</span><span class="p">;</span>
+  <span class="c1">//波段</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">nBandCount</span> <span class="o">=</span> <span class="n">iBandSize</span><span class="p">;</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">panSrcBands</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)</span> <span class="n">CPLMalloc</span><span class="p">(</span><span class="n">iBandSize</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">panDstBands</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)</span> <span class="n">CPLMalloc</span><span class="p">(</span><span class="n">iBandSize</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+
+  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">iBandSize</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">panSrcBands</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pSrcBand</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">panDstBands</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pDstBand</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="c1">//变换函数设置</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">hTransformArg</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="n">hTransformArg</span> <span class="o">=</span>  <span class="n">GDALCreateGenImgProjTransformer2</span><span class="p">(</span>
+                     <span class="p">(</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDSrc</span><span class="p">,</span>
+                     <span class="p">(</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDDst</span><span class="p">,</span>
+                     <span class="nb">NULL</span><span class="p">);</span>
+  <span class="n">GDALTransformerFunc</span> <span class="n">pFnTransformer</span> <span class="o">=</span> <span class="n">GDALGenImgProjTransform</span><span class="p">;</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">pfnTransformer</span> <span class="o">=</span> <span class="n">pFnTransformer</span><span class="p">;</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">pTransformerArg</span> <span class="o">=</span> <span class="n">hTransformArg</span><span class="p">;</span>
+  <span class="c1">//进度条</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">pfnProgress</span> <span class="o">=</span> <span class="n">GDALTermProgress</span><span class="p">;</span>
+  <span class="c1">//优化选项</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">dfWarpMemoryLimit</span> <span class="o">=</span> <span class="mi">512000000</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">**</span><span class="n">papszWarpOptions</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="n">papszWarpOptions</span> <span class="o">=</span> <span class="n">CSLSetNameValue</span><span class="p">(</span><span class="n">papszWarpOptions</span><span class="p">,</span> <span class="s">&quot;NUM_THREADS&quot;</span><span class="p">,</span> <span class="s">&quot;ALL_CPUS&quot;</span><span class="p">);</span>
+  <span class="n">papszWarpOptions</span> <span class="o">=</span> <span class="n">CSLSetNameValue</span><span class="p">(</span><span class="n">papszWarpOptions</span><span class="p">,</span> <span class="s">&quot;WRITE_FLUSH&quot;</span><span class="p">,</span> <span class="s">&quot;YES&quot;</span><span class="p">);</span>
+  <span class="n">psWo</span><span class="o">-&gt;</span><span class="n">papszWarpOptions</span> <span class="o">=</span> <span class="n">papszWarpOptions</span><span class="p">;</span>
+  <span class="c1">//开始转换</span>
+  <span class="n">GDALWarpOperation</span> <span class="n">oWo</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">oWo</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">psWo</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CE_None</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">GDALClose</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDSrc</span><span class="p">);</span>
+    <span class="n">GDALClose</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDDst</span><span class="p">);</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">4</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">oWo</span><span class="p">.</span><span class="n">ChunkAndWarpMulti</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">newWidth</span><span class="p">,</span> <span class="n">newHeight</span><span class="p">);</span>
+  <span class="c1">//清理环境</span>
+  <span class="n">GDALDestroyGenImgProjTransformer</span><span class="p">(</span><span class="n">psWo</span><span class="o">-&gt;</span><span class="n">pTransformerArg</span><span class="p">);</span>
+  <span class="n">GDALDestroyWarpOptions</span><span class="p">(</span><span class="n">psWo</span><span class="p">);</span>
+  <span class="n">GDALClose</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDSrc</span><span class="p">);</span>
+  <span class="n">GDALClose</span><span class="p">((</span><span class="n">GDALDatasetH</span><span class="p">)</span> <span class="n">pDDst</span><span class="p">);</span>
+  <span class="k">delete</span><span class="p">[]</span> <span class="n">pSrcBand</span><span class="p">;</span>
+  <span class="k">delete</span><span class="p">[]</span> <span class="n">pDstBand</span><span class="p">;</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="optimization">
+<span id="id14"></span><h2>性能优化<a class="headerlink" href="#optimization" title="Permalink to this headline">¶</a></h2>
+<p>下面几点可以在使用变换API的时候提高处理效率。</p>
+<ul class="simple">
+<li>增加变换API使用的内存，可以使程序执行的更快。这个参数叫GDALWarpOptions::dfWarpMemoryLimit。理论上，越大的块对于数据I/O效率越高，并且变换的效率也会越高。然而，变换所需的内存和GDAL缓存应该小于机器的内存，最多是内存的2/3左右。</li>
+<li>增加GDAL的缓存。这个尤其对于在处理非常大的输入图像很有用。如果所有的输入输出图像的数据频繁的读取会极大的降低运行效率。使用函数GDALSetCacheMax()来设置GDAL使用的最大缓存。</li>
+<li>当写入一个空的输出文件，在GDALWarpOptions::papszWarpOptions 对象中使用INIT_DEST选项来进行设置。这样可以很大的减少磁盘的IO操作。</li>
+<li>输入和输出文件使用分块存储的文件格式。分块文件格式可以快速的访问一块数据，相比来说，普通的大数据量的顺序存储文件格式在IO操作中要花费更多的时间。</li>
+<li>在一次调用中处理所有的波段。一次处理所有的波段比每次处理一个波段要保险。</li>
+<li>使用GDALWarpOperation::ChunkAndWarpMulti()方法来代替GDALWarpOperation::ChunkAndWarpImage()方法。这个使用多个独立的线程来进行IO操作和变换影像处理，能够提高CPU和IO的效率。执行这个操作，GDAL需要多线程的支持（从GDAL1.8.0开始，默认在Win32平台、Unix平台是支持的，对于之前的版本，需要在配置中进行修改才行）。</li>
+<li>重采样方式，最邻近象元执行速度最快，双线性内插次之，三次立方卷次最慢。不要使用根据复杂的重采样函数。</li>
+<li>避免使用复杂的掩码选项。比如，最邻近采样在处理没有掩码的8bit数据要比一般的效率高很多。</li>
+<li>使用近似的变换代替精确的变换（精确的变换是每个象元都会计算一次）。下面的代码用来说明近似变换的使用方式，近似变换要求指定一个变换的误差dfErrorThreshold，这个误差单位是输出图像的象元个数</li>
+</ul>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">hTransformArg</span> <span class="o">=</span>  <span class="n">GDALCreateApproxTransformer</span><span class="p">(</span><span class="n">GDALGenImgProjTransform</span><span class="p">,</span>
+                                             <span class="n">hGenImgProjArg</span><span class="p">,</span>
+                                             <span class="n">dfErrorThreshold</span> <span class="p">);</span>
+<span class="n">pfnTransformer</span> <span class="o">=</span> <span class="n">GDALApproxTransform</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="static-build.html" class="btn btn-neutral float-right" title="静态编译" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="gdal-cheat-sheet.html" class="btn btn-neutral" title="GDAL Cheat Sheet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2013-2018, wuqi.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

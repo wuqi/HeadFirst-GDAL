@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <meta charset="utf-8" />
+    <title>矢量数据读写</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> 
+  </head>
+  <body>
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ogrreadwrite">
+<span id="id1"></span><h1>矢量数据读写</h1>
+<div class="section" id="ogrread">
+<span id="id2"></span><h2>数据读取</h2>
+<p>与栅格的 <a class="reference internal" href="read-and-write.xhtml#gdalread"><span class="std std-ref">数据读取</span></a> 流程类似，但矢量数据定位明显，属性隐含，其几何形状和属性需要分开读取，GDAL有两个版本，读取接口不同，但是流程基本相同，以下是获取流程：</p>
+<ul class="simple">
+<li><p>注册驱动</p></li>
+<li><p>打开数据集</p></li>
+<li><p>打开图层</p></li>
+<li><p>获取要素类定义</p></li>
+<li><p>遍历要素</p></li>
+<li><p>获取几何形状以及属性信息</p></li>
+</ul>
+<p><code class="docutils literal"><span class="pre">1.x</span></code> 版本完整代码示例：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;ogrsf_frmts.h&quot;</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">//注册驱动</span>
+    <span class="n">OGRRegisterAll</span><span class="p">();</span>
+    <span class="c1">//打开数据集</span>
+    <span class="n">OGRDataSource</span>       <span class="o">*</span><span class="n">poDS</span><span class="p">;</span>
+    <span class="n">poDS</span> <span class="o">=</span> <span class="n">OGRSFDriverRegistrar</span><span class="o">::</span><span class="n">Open</span><span class="p">(</span> <span class="s">&quot;point.shp&quot;</span><span class="p">,</span> <span class="n">FALSE</span> <span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poDS</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Open failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">//打开图层</span>
+    <span class="n">OGRLayer</span>  <span class="o">*</span><span class="n">poLayer</span><span class="p">;</span>
+    <span class="n">poLayer</span> <span class="o">=</span> <span class="n">poDS</span><span class="o">-&gt;</span><span class="n">GetLayerByName</span><span class="p">(</span> <span class="s">&quot;point&quot;</span> <span class="p">);</span>
+    <span class="n">OGRFeature</span> <span class="o">*</span><span class="n">poFeature</span><span class="p">;</span>
+    <span class="c1">//遍历要素</span>
+    <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">ResetReading</span><span class="p">();</span>
+    <span class="k">while</span><span class="p">(</span> <span class="p">(</span><span class="n">poFeature</span> <span class="o">=</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">GetNextFeature</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">//获取要素类定义</span>
+        <span class="n">OGRFeatureDefn</span> <span class="o">*</span><span class="n">poFDefn</span> <span class="o">=</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">GetLayerDefn</span><span class="p">();</span>
+        <span class="kt">int</span> <span class="n">iField</span><span class="p">;</span>
+        <span class="c1">//获取属性信息</span>
+        <span class="k">for</span><span class="p">(</span> <span class="n">iField</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">iField</span> <span class="o">&lt;</span> <span class="n">poFDefn</span><span class="o">-&gt;</span><span class="n">GetFieldCount</span><span class="p">();</span> <span class="n">iField</span><span class="o">++</span> <span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">OGRFieldDefn</span> <span class="o">*</span><span class="n">poFieldDefn</span> <span class="o">=</span> <span class="n">poFDefn</span><span class="o">-&gt;</span><span class="n">GetFieldDefn</span><span class="p">(</span> <span class="n">iField</span> <span class="p">);</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">poFieldDefn</span><span class="o">-&gt;</span><span class="n">GetType</span><span class="p">()</span> <span class="o">==</span> <span class="n">OFTInteger</span> <span class="p">)</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%d,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsInteger</span><span class="p">(</span> <span class="n">iField</span> <span class="p">)</span> <span class="p">);</span>
+            <span class="k">else</span> <span class="k">if</span><span class="p">(</span> <span class="n">poFieldDefn</span><span class="o">-&gt;</span><span class="n">GetType</span><span class="p">()</span> <span class="o">==</span> <span class="n">OFTReal</span> <span class="p">)</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%.3f,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsDouble</span><span class="p">(</span><span class="n">iField</span><span class="p">)</span> <span class="p">);</span>
+            <span class="k">else</span> <span class="k">if</span><span class="p">(</span> <span class="n">poFieldDefn</span><span class="o">-&gt;</span><span class="n">GetType</span><span class="p">()</span> <span class="o">==</span> <span class="n">OFTString</span> <span class="p">)</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%s,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsString</span><span class="p">(</span><span class="n">iField</span><span class="p">)</span> <span class="p">);</span>
+            <span class="k">else</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%s,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsString</span><span class="p">(</span><span class="n">iField</span><span class="p">)</span> <span class="p">);</span>
+        <span class="p">}</span>
+        <span class="c1">//获取几何形状</span>
+        <span class="n">OGRGeometry</span> <span class="o">*</span><span class="n">poGeometry</span><span class="p">;</span>
+        <span class="n">poGeometry</span> <span class="o">=</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetGeometryRef</span><span class="p">();</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">poGeometry</span> <span class="o">!=</span> <span class="nb">NULL</span>
+            <span class="o">&amp;&amp;</span> <span class="n">wkbFlatten</span><span class="p">(</span><span class="n">poGeometry</span><span class="o">-&gt;</span><span class="n">getGeometryType</span><span class="p">())</span> <span class="o">==</span> <span class="n">wkbPoint</span> <span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">OGRPoint</span> <span class="o">*</span><span class="n">poPoint</span> <span class="o">=</span> <span class="p">(</span><span class="n">OGRPoint</span> <span class="o">*</span><span class="p">)</span> <span class="n">poGeometry</span><span class="p">;</span>
+            <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%.3f,%3.f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">poPoint</span><span class="o">-&gt;</span><span class="n">getX</span><span class="p">(),</span> <span class="n">poPoint</span><span class="o">-&gt;</span><span class="n">getY</span><span class="p">()</span> <span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;no point geometry</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">OGRFeature</span><span class="o">::</span><span class="n">DestroyFeature</span><span class="p">(</span> <span class="n">poFeature</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">OGRDataSource</span><span class="o">::</span><span class="n">DestroyDataSource</span><span class="p">(</span> <span class="n">poDS</span> <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>2.x 版本中最主要修改为 <code class="docutils literal"><span class="pre">GDALDataset</span></code> 代替``OGRDataSource`` 其余接口大致不变.打开方式略有区别</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">* @param pszFilename 文件名</span>
+<span class="cm">* @param nOpenFlags  GDAL_OF_RASTER/GDAL_OF_VECTOR  数据类型</span>
+<span class="cm">                     GDAL_OF_READONLY/GDAL_OF_UPDATE 打开方式</span>
+<span class="cm">                     GDAL_OF_SHARED 共享模式</span>
+<span class="cm">                     GDAL_OF_VERBOSE_ERROR 返回详细错误</span>
+<span class="cm">* @param papszAllowedDrivers NULL或以NULL结尾的列表,指定驱动</span>
+<span class="cm">* @param papszOpenOptions NULL或以NULL结尾的字符串列表,根据驱动设置</span>
+<span class="cm">* @param papszSiblingFiles NULL或以NULL结尾的文件列表</span>
+<span class="cm">*/</span>
+<span class="n">GDALDatasetH</span> <span class="n">GDALOpenEx</span>     <span class="p">(</span>       <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>    <span class="n">pszFilename</span><span class="p">,</span>
+<span class="kt">unsigned</span> <span class="kt">int</span>        <span class="n">nOpenFlags</span><span class="p">,</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="k">const</span> <span class="o">*</span>         <span class="n">papszAllowedDrivers</span><span class="p">,</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="k">const</span> <span class="o">*</span>         <span class="n">papszOpenOptions</span><span class="p">,</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="k">const</span> <span class="o">*</span>         <span class="n">papszSiblingFiles</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>2.x 版本完整代码示例：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;ogrsf_frmts.h&quot;</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">//主要修改</span>
+    <span class="n">GDALAllRegister</span><span class="p">();</span>
+    <span class="n">GDALDataset</span>       <span class="o">*</span><span class="n">poDS</span><span class="p">;</span>
+    <span class="n">poDS</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span><span class="o">*</span><span class="p">)</span> <span class="n">GDALOpenEx</span><span class="p">(</span> <span class="s">&quot;point.shp&quot;</span><span class="p">,</span> <span class="n">GDAL_OF_VECTOR</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poDS</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Open failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">//后面与1.x版本一致</span>
+    <span class="n">OGRLayer</span>  <span class="o">*</span><span class="n">poLayer</span><span class="p">;</span>
+    <span class="n">poLayer</span> <span class="o">=</span> <span class="n">poDS</span><span class="o">-&gt;</span><span class="n">GetLayerByName</span><span class="p">(</span> <span class="s">&quot;point&quot;</span> <span class="p">);</span>
+    <span class="c1">//寻找特定字段</span>
+    <span class="n">OGRFeatureDefn</span> <span class="o">*</span><span class="n">poFDefn</span> <span class="o">=</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">GetLayerDefn</span><span class="p">();</span>
+
+    <span class="kt">int</span> <span class="n">nSIDIndex</span> <span class="o">=</span> <span class="n">poFDefn</span><span class="o">-&gt;</span><span class="n">GetFieldIndex</span><span class="p">(</span><span class="s">&quot;SS_ID&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nSIDIndex</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;can&#39;t find SS_ID field.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">OGRFeature</span> <span class="o">*</span><span class="n">poFeature</span><span class="p">;</span>
+    <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">ResetReading</span><span class="p">();</span>
+    <span class="k">while</span><span class="p">(</span> <span class="p">(</span><span class="n">poFeature</span> <span class="o">=</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">GetNextFeature</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">//获取固定字段值</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">nSIDIndex</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">strSSID</span> <span class="o">=</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsString</span><span class="p">(</span><span class="n">nSIDIndex</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">OGRFeatureDefn</span> <span class="o">*</span><span class="n">poFDefn</span> <span class="o">=</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">GetLayerDefn</span><span class="p">();</span>
+        <span class="kt">int</span> <span class="n">iField</span><span class="p">;</span>
+        <span class="k">for</span><span class="p">(</span> <span class="n">iField</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">iField</span> <span class="o">&lt;</span> <span class="n">poFDefn</span><span class="o">-&gt;</span><span class="n">GetFieldCount</span><span class="p">();</span> <span class="n">iField</span><span class="o">++</span> <span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">OGRFieldDefn</span> <span class="o">*</span><span class="n">poFieldDefn</span> <span class="o">=</span> <span class="n">poFDefn</span><span class="o">-&gt;</span><span class="n">GetFieldDefn</span><span class="p">(</span> <span class="n">iField</span> <span class="p">);</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">poFieldDefn</span><span class="o">-&gt;</span><span class="n">GetType</span><span class="p">()</span> <span class="o">==</span> <span class="n">OFTInteger</span> <span class="p">)</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%d,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsInteger</span><span class="p">(</span> <span class="n">iField</span> <span class="p">)</span> <span class="p">);</span>
+            <span class="k">else</span> <span class="k">if</span><span class="p">(</span> <span class="n">poFieldDefn</span><span class="o">-&gt;</span><span class="n">GetType</span><span class="p">()</span> <span class="o">==</span> <span class="n">OFTInteger64</span> <span class="p">)</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="n">CPL_FRMT_GIB</span> <span class="s">&quot;,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsInteger64</span><span class="p">(</span> <span class="n">iField</span> <span class="p">)</span> <span class="p">);</span>
+            <span class="k">else</span> <span class="k">if</span><span class="p">(</span> <span class="n">poFieldDefn</span><span class="o">-&gt;</span><span class="n">GetType</span><span class="p">()</span> <span class="o">==</span> <span class="n">OFTReal</span> <span class="p">)</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%.3f,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsDouble</span><span class="p">(</span><span class="n">iField</span><span class="p">)</span> <span class="p">);</span>
+            <span class="k">else</span> <span class="k">if</span><span class="p">(</span> <span class="n">poFieldDefn</span><span class="o">-&gt;</span><span class="n">GetType</span><span class="p">()</span> <span class="o">==</span> <span class="n">OFTString</span> <span class="p">)</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%s,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsString</span><span class="p">(</span><span class="n">iField</span><span class="p">)</span> <span class="p">);</span>
+            <span class="k">else</span>
+                <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%s,&quot;</span><span class="p">,</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetFieldAsString</span><span class="p">(</span><span class="n">iField</span><span class="p">)</span> <span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">OGRGeometry</span> <span class="o">*</span><span class="n">poGeometry</span><span class="p">;</span>
+        <span class="n">poGeometry</span> <span class="o">=</span> <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">GetGeometryRef</span><span class="p">();</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">poGeometry</span> <span class="o">!=</span> <span class="nb">NULL</span>
+                <span class="o">&amp;&amp;</span> <span class="n">wkbFlatten</span><span class="p">(</span><span class="n">poGeometry</span><span class="o">-&gt;</span><span class="n">getGeometryType</span><span class="p">())</span> <span class="o">==</span> <span class="n">wkbPoint</span> <span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">OGRPoint</span> <span class="o">*</span><span class="n">poPoint</span> <span class="o">=</span> <span class="p">(</span><span class="n">OGRPoint</span> <span class="o">*</span><span class="p">)</span> <span class="n">poGeometry</span><span class="p">;</span>
+            <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%.3f,%3.f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">poPoint</span><span class="o">-&gt;</span><span class="n">getX</span><span class="p">(),</span> <span class="n">poPoint</span><span class="o">-&gt;</span><span class="n">getY</span><span class="p">()</span> <span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;no point geometry</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">OGRFeature</span><span class="o">::</span><span class="n">DestroyFeature</span><span class="p">(</span> <span class="n">poFeature</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">GDALClose</span><span class="p">(</span> <span class="n">poDS</span> <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<ul class="simple">
+<li><p>有很多矢量驱动是只读的，无法像栅格那样直接修改和创建文件。</p></li>
+<li><p>如果需要确定，可以使用 <code class="docutils literal"><span class="pre">ogrinfo</span> <span class="pre">--formats</span></code> 确定驱动的权限。</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="ogrwrite">
+<span id="id3"></span><h2>数据写入</h2>
+<p>数据写入与读取类似，流程如下：</p>
+<ul class="simple">
+<li><p>注册驱动</p></li>
+<li><p>打开或创建数据集</p></li>
+<li><p>创建图层</p></li>
+<li><p>创建要素类定义</p></li>
+<li><p>新建几何形状</p></li>
+<li><p>新建要素</p></li>
+<li><p>关闭数据集</p></li>
+</ul>
+<p>1.x完整代码示例（ <code class="docutils literal"><span class="pre">C++</span></code>）：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;ogrsf_frmts.h&quot;</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pszDriverName</span> <span class="o">=</span> <span class="s">&quot;ESRI Shapefile&quot;</span><span class="p">;</span>
+    <span class="n">OGRSFDriver</span> <span class="o">*</span><span class="n">poDriver</span><span class="p">;</span>
+    <span class="n">OGRRegisterAll</span><span class="p">();</span>
+    <span class="n">poDriver</span> <span class="o">=</span> <span class="n">OGRSFDriverRegistrar</span><span class="o">::</span><span class="n">GetRegistrar</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetDriverByName</span><span class="p">(</span>
+                <span class="n">pszDriverName</span> <span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poDriver</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%s driver not available.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">pszDriverName</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">OGRDataSource</span> <span class="o">*</span><span class="n">poDS</span><span class="p">;</span>
+    <span class="n">poDS</span> <span class="o">=</span> <span class="n">poDriver</span><span class="o">-&gt;</span><span class="n">CreateDataSource</span><span class="p">(</span> <span class="s">&quot;point_out.shp&quot;</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poDS</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Creation of output file failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">OGRLayer</span> <span class="o">*</span><span class="n">poLayer</span><span class="p">;</span>
+    <span class="n">poLayer</span> <span class="o">=</span> <span class="n">poDS</span><span class="o">-&gt;</span><span class="n">CreateLayer</span><span class="p">(</span> <span class="s">&quot;point_out&quot;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">wkbPoint</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poLayer</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Layer creation failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">OGRFieldDefn</span> <span class="n">oField</span><span class="p">(</span> <span class="s">&quot;Name&quot;</span><span class="p">,</span> <span class="n">OFTString</span> <span class="p">);</span>
+    <span class="n">oField</span><span class="p">.</span><span class="n">SetWidth</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">CreateField</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">oField</span> <span class="p">)</span> <span class="o">!=</span> <span class="n">OGRERR_NONE</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Creating Name field failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">szName</span><span class="p">[</span><span class="mi">33</span><span class="p">];</span>
+    <span class="k">while</span><span class="p">(</span> <span class="o">!</span><span class="n">feof</span><span class="p">(</span><span class="n">stdin</span><span class="p">)</span>
+           <span class="o">&amp;&amp;</span> <span class="n">fscanf</span><span class="p">(</span> <span class="n">stdin</span><span class="p">,</span> <span class="s">&quot;%lf,%lf,%32s&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">,</span> <span class="n">szName</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">OGRFeature</span> <span class="o">*</span><span class="n">poFeature</span><span class="p">;</span>
+        <span class="n">poFeature</span> <span class="o">=</span> <span class="n">OGRFeature</span><span class="o">::</span><span class="n">CreateFeature</span><span class="p">(</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">GetLayerDefn</span><span class="p">()</span> <span class="p">);</span>
+        <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">SetField</span><span class="p">(</span> <span class="s">&quot;Name&quot;</span><span class="p">,</span> <span class="n">szName</span> <span class="p">);</span>
+        <span class="n">OGRPoint</span> <span class="n">pt</span><span class="p">;</span>
+
+        <span class="n">pt</span><span class="p">.</span><span class="n">setX</span><span class="p">(</span> <span class="n">x</span> <span class="p">);</span>
+        <span class="n">pt</span><span class="p">.</span><span class="n">setY</span><span class="p">(</span> <span class="n">y</span> <span class="p">);</span>
+
+        <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">SetGeometry</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">pt</span> <span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">CreateFeature</span><span class="p">(</span> <span class="n">poFeature</span> <span class="p">)</span> <span class="o">!=</span> <span class="n">OGRERR_NONE</span> <span class="p">)</span>
+        <span class="p">{</span>
+           <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Failed to create feature in shapefile.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+           <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+        <span class="p">}</span>
+         <span class="n">OGRFeature</span><span class="o">::</span><span class="n">DestroyFeature</span><span class="p">(</span> <span class="n">poFeature</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">OGRDataSource</span><span class="o">::</span><span class="n">DestroyDataSource</span><span class="p">(</span> <span class="n">poDS</span> <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>2.x 完整代码示例（ <code class="docutils literal"><span class="pre">C++</span></code>）：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;ogrsf_frmts.h&quot;</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pszDriverName</span> <span class="o">=</span> <span class="s">&quot;ESRI Shapefile&quot;</span><span class="p">;</span>
+    <span class="n">GDALDriver</span> <span class="o">*</span><span class="n">poDriver</span><span class="p">;</span>
+    <span class="n">GDALAllRegister</span><span class="p">();</span>
+    <span class="n">poDriver</span> <span class="o">=</span> <span class="n">GetGDALDriverManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="n">pszDriverName</span> <span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poDriver</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;%s driver not available.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">pszDriverName</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">GDALDataset</span> <span class="o">*</span><span class="n">poDS</span><span class="p">;</span>
+    <span class="n">poDS</span> <span class="o">=</span> <span class="n">poDriver</span><span class="o">-&gt;</span><span class="n">Create</span><span class="p">(</span> <span class="s">&quot;point_out.shp&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">GDT_Unknown</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poDS</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Creation of output file failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">OGRLayer</span> <span class="o">*</span><span class="n">poLayer</span><span class="p">;</span>
+    <span class="n">poLayer</span> <span class="o">=</span> <span class="n">poDS</span><span class="o">-&gt;</span><span class="n">CreateLayer</span><span class="p">(</span> <span class="s">&quot;point_out&quot;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">wkbPoint</span><span class="p">,</span> <span class="nb">NULL</span> <span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poLayer</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Layer creation failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">OGRFieldDefn</span> <span class="n">oField</span><span class="p">(</span> <span class="s">&quot;Name&quot;</span><span class="p">,</span> <span class="n">OFTString</span> <span class="p">);</span>
+    <span class="n">oField</span><span class="p">.</span><span class="n">SetWidth</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">CreateField</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">oField</span> <span class="p">)</span> <span class="o">!=</span> <span class="n">OGRERR_NONE</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Creating Name field failed.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">szName</span><span class="p">[</span><span class="mi">33</span><span class="p">];</span>
+    <span class="k">while</span><span class="p">(</span> <span class="o">!</span><span class="n">feof</span><span class="p">(</span><span class="n">stdin</span><span class="p">)</span>
+           <span class="o">&amp;&amp;</span> <span class="n">fscanf</span><span class="p">(</span> <span class="n">stdin</span><span class="p">,</span> <span class="s">&quot;%lf,%lf,%32s&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">,</span> <span class="n">szName</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">OGRFeature</span> <span class="o">*</span><span class="n">poFeature</span><span class="p">;</span>
+        <span class="n">poFeature</span> <span class="o">=</span> <span class="n">OGRFeature</span><span class="o">::</span><span class="n">CreateFeature</span><span class="p">(</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">GetLayerDefn</span><span class="p">()</span> <span class="p">);</span>
+        <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">SetField</span><span class="p">(</span> <span class="s">&quot;Name&quot;</span><span class="p">,</span> <span class="n">szName</span> <span class="p">);</span>
+        <span class="n">OGRPoint</span> <span class="n">pt</span><span class="p">;</span>
+
+        <span class="n">pt</span><span class="p">.</span><span class="n">setX</span><span class="p">(</span> <span class="n">x</span> <span class="p">);</span>
+        <span class="n">pt</span><span class="p">.</span><span class="n">setY</span><span class="p">(</span> <span class="n">y</span> <span class="p">);</span>
+
+        <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">SetGeometry</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">pt</span> <span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">CreateFeature</span><span class="p">(</span> <span class="n">poFeature</span> <span class="p">)</span> <span class="o">!=</span> <span class="n">OGRERR_NONE</span> <span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span> <span class="s">&quot;Failed to create feature in shapefile.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">);</span>
+            <span class="n">exit</span><span class="p">(</span> <span class="mi">1</span> <span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">OGRFeature</span><span class="o">::</span><span class="n">DestroyFeature</span><span class="p">(</span> <span class="n">poFeature</span> <span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">GDALClose</span><span class="p">(</span> <span class="n">poDS</span> <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>数据修改</h2>
+<p>GDAL可以添加、删除、修改属性信息和要素，下面简单介绍下如何添加/编辑属性字段(2.x)：</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">GDALDataset</span><span class="o">*</span> <span class="n">dst</span> <span class="o">=</span> <span class="p">(</span><span class="n">GDALDataset</span><span class="o">*</span><span class="p">)</span><span class="n">GDALOpenEx</span><span class="p">(</span><span class="n">shpName</span><span class="p">,</span> <span class="n">GDAL_OF_UPDATE</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="n">OGRLayer</span>  <span class="o">*</span><span class="n">poLayer</span> <span class="o">=</span> <span class="n">dst</span><span class="o">-&gt;</span><span class="n">GetLayer</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">OGRFieldDefn</span> <span class="nf">oField</span><span class="p">(</span><span class="s">&quot;imgNo&quot;</span><span class="p">,</span> <span class="n">OFTString</span><span class="p">);</span>  <span class="c1">// Add fields</span>
+<span class="n">oField</span><span class="p">.</span><span class="n">SetWidth</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">CreateField</span><span class="p">(</span><span class="o">&amp;</span><span class="n">oField</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">)</span> <span class="o">!=</span> <span class="n">OGRERR_NONE</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;Creating Name field failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">OGRFeature</span> <span class="o">*</span><span class="n">poFeature</span><span class="p">;</span>
+
+<span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">ResetReading</span><span class="p">();</span>
+<span class="k">while</span> <span class="p">((</span><span class="n">poFeature</span> <span class="o">=</span> <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">GetNextFeature</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">poFeature</span><span class="o">-&gt;</span><span class="n">SetField</span><span class="p">(</span><span class="s">&quot;imgNo&quot;</span><span class="p">,</span> <span class="s">&quot;123456&quot;</span><span class="p">);</span>  <span class="c1">// Set fields</span>
+    <span class="n">poLayer</span><span class="o">-&gt;</span><span class="n">SetFeature</span><span class="p">(</span><span class="n">poFeature</span><span class="p">);</span>
+    <span class="n">OGRFeature</span><span class="o">::</span><span class="n">DestroyFeature</span><span class="p">(</span><span class="n">poFeature</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">GDALClose</span><span class="p">(</span><span class="n">dst</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>
