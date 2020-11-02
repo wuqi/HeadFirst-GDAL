@@ -26,6 +26,7 @@ HeadFirst GDAL
     ogr-sql
     sqlite-sql
     ogr-utilities
+    ogr_layer_algebra
 
 Indices and tables
 ==================
