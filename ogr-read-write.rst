@@ -100,6 +100,13 @@
     const char *const * 	papszSiblingFiles 
     )	
 
+
+.. attention::
+
+    * 打开前建议添加 ``CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");`` 设置,保证windows下文件名中文路径正常打开
+    * 打开前添加 ``CPLSetConfigOption("SHAPE_ENCODING", "");`` 读出来编码和系统编码保持一致
+
+
 2.x 版本完整代码示例： 
 
 .. code-block:: c++
@@ -107,6 +114,8 @@
     #include "ogrsf_frmts.h"
     int main()
     {
+        CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
+        CPLSetConfigOption("SHAPE_ENCODING", "");
         //主要修改
         GDALAllRegister();
         GDALDataset       *poDS;
@@ -342,3 +351,29 @@ GDAL可以添加、删除、修改属性信息和要素，下面简单介绍下�
         OGRFeature::DestroyFeature(poFeature);
     }
     GDALClose(dst);
+
+删除其实也类似,需要注意打开时一定要加上 ``GDAL_OF_UPDATE`` 设置
+
+.. code-block:: c++
+    CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
+    CPLSetConfigOption("SHAPE_ENCODING", "");
+    GDALAllRegister();
+    GDALDataset *poDS;
+    poDS = (GDALDataset*)GDALOpenEx(strIn.c_str(), GDAL_OF_VECTOR| GDAL_OF_UPDATE, NULL, NULL, NULL);
+
+    OGRLayer* pLayer = poDS->GetLayer(0);
+    if (!pLayer->TestCapability(OLCDeleteFeature))
+    {
+        LOGI( "Layer does not support delete feature capability");
+    }
+    pLayer->DeleteFeature(1);
+    pLayer->DeleteFeature(2);
+    pLayer->DeleteFeature(3);
+    pLayer->DeleteFeature(4);
+    pLayer->DeleteFeature(5);
+    pLayer->SyncToDisk();
+    std::stringstream sql;
+    //shapefile需要这一步才能真正写入
+    sql << "REPACK " << pLayer->GetName();
+    poDS->ExecuteSQL(sql.str().c_str(), NULL, NULL);
+    GDALClose(poDS);
