@@ -352,6 +352,7 @@ GDAL可以添加、删除、修改属性信息和要素，下面简单介绍下�
     }
     GDALClose(dst);
 
+
 删除其实也类似,需要注意打开时一定要加上 ``GDAL_OF_UPDATE`` 设置
 
 .. code-block:: c++
