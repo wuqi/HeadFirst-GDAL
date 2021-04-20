@@ -356,12 +356,13 @@ GDAL可以添加、删除、修改属性信息和要素，下面简单介绍下�
 删除其实也类似,需要注意打开时一定要加上 ``GDAL_OF_UPDATE`` 设置
 
 .. code-block:: c++
+
     CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
     CPLSetConfigOption("SHAPE_ENCODING", "");
     GDALAllRegister();
-    GDALDataset *poDS;
-    poDS = (GDALDataset*)GDALOpenEx(strIn.c_str(), GDAL_OF_VECTOR| GDAL_OF_UPDATE, NULL, NULL, NULL);
-
+    GDALDataset *poDS = (GDALDataset*)GDALOpenEx(strIn.c_str(),\
+     GDAL_OF_VECTOR| GDAL_OF_UPDATE, NULL, NULL, NULL);
+    
     OGRLayer* pLayer = poDS->GetLayer(0);
     if (!pLayer->TestCapability(OLCDeleteFeature))
     {
@@ -378,3 +379,8 @@ GDAL可以添加、删除、修改属性信息和要素，下面简单介绍下�
     sql << "REPACK " << pLayer->GetName();
     poDS->ExecuteSQL(sql.str().c_str(), NULL, NULL);
     GDALClose(poDS);
+
+
+.. attention::
+
+    * 处理shp文件时记得最后要执行 ``REPACK 表名`` ,否则只是临时标记,不会真正删除。
