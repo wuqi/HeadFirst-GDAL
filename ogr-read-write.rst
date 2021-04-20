@@ -384,3 +384,27 @@ GDAL可以添加、删除、修改属性信息和要素，下面简单介绍下�
 .. attention::
 
     * 处理shp文件时记得最后要执行 ``REPACK 表名`` ,否则只是临时标记,不会真正删除。
+
+******************
+创建空间索引
+******************
+
+有时候合并和处理比较慢,可以尝试先建立空间索引再处理,建空间索引方式跟执行sql一样,调用 ``GDALDataset::ExecuteSQL`` 方法
+
+* 删除空间索引  ``DROP SPATIAL INDEX ON tablename``
+* 创建空间索引  ``CREATE SPATIAL INDEX ON tablename [DEPTH N]`` N从1-12,指示索引树深度
+
+.. code-block:: c++
+
+    GDALDataset *poDS = (GDALDataset*)GDALOpenEx(strIn.c_str(),\
+     GDAL_OF_VECTOR| GDAL_OF_SHARED, NULL, NULL, NULL);
+     OGRLayer* pLayer = poDS->->GetLayer(0);
+    std::string strCreateIndex = "CREATE SPATIAL INDEX ON ";
+    strCreateIndex += pLayer->GetName();
+    //执行创建空间索引的返回是NULL,不需要判断这里
+    OGRLayer *idxBase = dsBase->ExecuteSQL(strCreateBase.ToPlatform().c_str(), NULL, NULL);
+    ...
+
+.. attention::
+
+    * 如果表名有空格,在sql里用转义的双引号括起来即可
