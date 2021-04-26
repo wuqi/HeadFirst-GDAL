@@ -375,7 +375,7 @@ GDAL可以添加、删除、修改属性信息和要素，下面简单介绍下�
     pLayer->DeleteFeature(5);
     pLayer->SyncToDisk();
     std::stringstream sql;
-    //shapefile需要这一步才能真正写入
+    //GDAL版本小于2.2时,shapefile需要这一步才能真正写入
     sql << "REPACK " << pLayer->GetName();
     poDS->ExecuteSQL(sql.str().c_str(), NULL, NULL);
     GDALClose(poDS);
@@ -383,7 +383,8 @@ GDAL可以添加、删除、修改属性信息和要素，下面简单介绍下�
 
 .. attention::
 
-    * 处理shp文件时记得最后要执行 ``REPACK 表名`` ,否则只是临时标记,不会真正删除。
+    * GDAL版本小于2.2时,处理shp文件时记得最后要执行 ``REPACK 表名`` ,否则只是临时标记,不会真正删除。
+    * GDAL 2.2之后的版本在调用 ``FlushCache()`` 或 ``SyncToDisk()`` 时会自动执行 ``REPACK`` 
 
 ******************
 创建空间索引
