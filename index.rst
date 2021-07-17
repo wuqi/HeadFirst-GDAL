@@ -20,6 +20,7 @@ HeadFirst GDAL
     gdal-cheat-sheet
     gdal-warp-api-tutorial
     static-build
+    gdal_3_build
     ogr-architecture
     ogr-proj
     ogr-read-write
