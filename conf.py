@@ -71,7 +71,7 @@ release = '0.1'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build','theme']
+exclude_patterns = ['_build','theme','src']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -111,7 +111,7 @@ html_theme = 'sphinx_rtd_theme'
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ['theme']
+# html_theme_path = ['theme']  # 使用 pip 安装的 sphinx_rtd_theme
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -190,7 +190,7 @@ latex_elements = {
 'pointsize': '10pt',
 'classoptions': ',oneside',
  'babel': '\\usepackage[english]{babel}',
-'preamble': '''
+'preamble': r'''
 \setcounter{tocdepth}{3}
 \\hypersetup{unicode=true}
 \\usepackage{CJKutf8}
@@ -344,4 +344,7 @@ epub_copyright = u'2013, wuqi'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3/', None)
+}
+

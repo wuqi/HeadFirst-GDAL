@@ -8,7 +8,7 @@ HeadFirst GDAL
 ################
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
 
     preface
     formats
@@ -28,6 +28,14 @@ HeadFirst GDAL
     sqlite-sql
     ogr-utilities
     ogr_layer_algebra
+    gdal3-overview
+    gdal3-raster-api
+    gdal3-vector-api
+    gdal3-srs-proj
+    gdal3-driver-dev
+    gdal3-vsi-cpl
+    gdal3-tools
+    gdal3-algorithms
 
 Indices and tables
 ==================

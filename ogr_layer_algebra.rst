@@ -1,5 +1,5 @@
-.. hightlight:: rst
-.. _OGRLayerAlgebra
+.. highlight:: rst
+.. _OGRLayerAlgebra:
 
 
 ############################
@@ -10,7 +10,7 @@ OGR Layer Algebra
 ********************
 简介
 ********************
-`OGRLayer` OGR层类空间分析的基本功能,包括 `Intersection Union  SymDifference Identity Update Clip Erase`几种基础功能
+``OGRLayer`` OGR层类空间分析的基本功能，包括 ``Intersection``、``Union``、``SymDifference``、``Identity``、``Update``、``Clip``、``Erase`` 几种基础功能。
 
 代码如下:
 
