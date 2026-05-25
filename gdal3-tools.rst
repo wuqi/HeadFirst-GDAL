@@ -1003,6 +1003,110 @@ C++ API
         return 0;
     }
 
+Pipeline 编程调用
+=================
+
+Pipeline 算法的编程调用与单个算法不同，需要通过 ``ParseCommandLineArguments()`` 传入步骤列表。
+步骤之间用 ``!`` 分隔，语法与 CLI 一致。
+
+C API（Pipeline）：
+
+.. code-block:: c
+
+    #include "gdal.h"
+    #include "gdalalgorithm.h"
+
+    int main()
+    {
+        GDALAllRegister();
+
+        /* 实例化 pipeline 算法 */
+        GDALAlgorithmRegistryH hRegistry = GDALGetGlobalAlgorithmRegistry();
+        const char *const papszPath[] = { "pipeline", NULL };
+        GDALAlgorithmH hPipeline = GDALAlgorithmRegistryInstantiateAlgFromPath(
+            hRegistry, papszPath);
+        GDALAlgorithmRegistryRelease(hRegistry);
+
+        if (!hPipeline) return 1;
+
+        /* 传入 Pipeline 步骤（与 CLI 参数一致） */
+        const char *const papszArgs[] = {
+            "read", "in.tif", "!",
+            "reproject", "--output-crs=EPSG:4326", "!",
+            "clip", "--bbox=100,30,120,50", "!",
+            "write", "out.tif", NULL
+        };
+
+        if (GDALAlgorithmParseCommandLineArguments(hPipeline, papszArgs)) {
+            GDALAlgorithmRun(hPipeline, NULL, NULL);
+        }
+
+        GDALAlgorithmFinalize(hPipeline);
+        GDALAlgorithmRelease(hPipeline);
+        return 0;
+    }
+
+C++ API（Pipeline）：
+
+.. code-block:: cpp
+
+    #include "gdal.h"
+    #include "gdalalgorithm.h"
+    #include <iostream>
+
+    int main()
+    {
+        GDALAllRegister();
+
+        /* 实例化 pipeline 算法 */
+        auto pipeline = GDALGlobalAlgorithmRegistry::GetSingleton()
+                            .Instantiate("pipeline");
+        if (!pipeline) return 1;
+
+        /* 传入 Pipeline 步骤 */
+        bool ok = pipeline->ParseCommandLineArguments({
+            "read", "in.tif", "!",
+            "reproject", "--output-crs=EPSG:4326", "!",
+            "clip", "--bbox=100,30,120,50", "!",
+            "write", "out.tif"
+        });
+
+        if (ok) {
+            if (pipeline->Run()) {
+                std::cout << "Pipeline 执行成功" << std::endl;
+            } else {
+                std::cout << "Pipeline 执行失败" << std::endl;
+            }
+        }
+
+        pipeline->Finalize();
+        return 0;
+    }
+
+矢量 Pipeline 示例：
+
+.. code-block:: cpp
+
+    /* 矢量 Pipeline：读取 → 筛选 → 投影 → 简化 → 输出 */
+    auto pipeline = GDALGlobalAlgorithmRegistry::GetSingleton()
+                        .Instantiate("pipeline");
+    pipeline->ParseCommandLineArguments({
+        "read", "roads.shp", "!",
+        "filter", "--where", "type='motorway'", "!",
+        "reproject", "--output-crs=EPSG:3857", "!",
+        "simplify", "--tolerance=10", "!",
+        "write", "roads_web.gpkg"
+    });
+    pipeline->Run();
+    pipeline->Finalize();
+
+.. note::
+
+    - Pipeline 步骤中的 ``!`` 分隔符是必须的，与 CLI 用法一致
+    - 也可以使用 ``"pipeline"`` 子命令路径实例化，如 ``Instantiate("raster", "pipeline")``
+      或 ``Instantiate("vector", "pipeline")`` 限定栅格或矢量 Pipeline
+    - 进度回调可通过 ``Run()`` 的参数传入，与单个算法一致
+
 Python API
 ==========
 
