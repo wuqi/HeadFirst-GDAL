@@ -26,12 +26,11 @@ void subsets2tif(const char *fileName, const char *outfile, \
     int charNum = strlen(fileName);
     charNum += 5;
     outFileName = new char[charNum];
-    strcpy(outFileName, fileName);
-    strcat(outFileName, ".tif") ;
+    snprintf(outFileName, charNum, "%s.tif", fileName);
   } else {
-    int charNum = strlen(outfile);
-    outFileName = new char[charNum + 1];
-    strcpy(outFileName, outfile);
+    int charNum = strlen(outfile) + 1;
+    outFileName = new char[charNum];
+    snprintf(outFileName, charNum, "%s", outfile);
   }
 
   RegisterAll();//注册类型，打开影像必须加入此句
@@ -54,8 +53,8 @@ void subsets2tif(const char *fileName, const char *outfile, \
     const char *Metadata = GDALGetDriverShortName((GDALDriverH)pDataSet);
     vSubDataSets[0] = new char[strlen(Metadata) + 1];
     vSubDataDesc[0] = new char[strlen(Metadata) + 1];
-    strcpy(vSubDataSets[0], Metadata);
-    strcpy(vSubDataDesc[0], Metadata);
+    snprintf(vSubDataSets[0], strlen(Metadata) + 1, "%s", Metadata);
+    snprintf(vSubDataDesc[0], strlen(Metadata) + 1, "%s", Metadata);
   } else {
     int iCount = CSLCount(papszSUBDATASETS);  //计算子数据集的个数
 
@@ -76,7 +75,7 @@ void subsets2tif(const char *fileName, const char *outfile, \
       if(setInfo[0] == '=') {
         memmove(setInfo, setInfo + 1, strlen(setInfo)); //提取元数据中子数据集名称
         vSubDataSets[j] = new char[strlen(setInfo) + 1];
-        strcpy(vSubDataSets[j], setInfo);
+        snprintf(vSubDataSets[j], strlen(setInfo) + 1, "%s", setInfo);
       }
 
       char *descptn = papszSUBDATASETS[i + 1];
