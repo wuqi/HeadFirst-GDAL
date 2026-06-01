@@ -1,0 +1,619 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "gdal-gnm",
+    "languages": ["c", "cpp"],
+    "frameworks": [],
+    "description": "GDAL Geographic Network Model subsystem",
+    "analyzedAt": "2026-06-01T00:00:00Z",
+    "gitCommitHash": "f84d77929c04bf52fb5a2aecb8ea7c32457c4404"
+  },
+  "nodes": [
+    {
+      "id": "file:src/gdal-3.13.0/apps/gnmanalyse.cpp",
+      "type": "file",
+      "name": "gnmanalyse.cpp",
+      "filePath": "src/gdal-3.13.0/apps/gnmanalyse.cpp",
+      "summary": "Command-line application for performing network analysis operations on GNM networks, including Dijkstra shortest path, K shortest paths (Yen's algorithm), and resource distribution (connected components via BFS).",
+      "tags": ["application", "cli", "network-analysis", "shortest-path", "dijkstra", "k-shortest-paths", "connected-components"],
+      "complexity": "complex",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/apps/gnmmanage.cpp",
+      "type": "file",
+      "name": "gnmmanage.cpp",
+      "filePath": "src/gdal-3.13.0/apps/gnmmanage.cpp",
+      "summary": "Command-line application for managing GNM networks: creating, deleting, importing layers, connecting/disconnecting features, adding rules, auto-connecting by tolerance, and changing block states.",
+      "tags": ["application", "cli", "network-management", "topology", "crud"],
+      "complexity": "complex",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_api.h",
+      "type": "file",
+      "name": "gnm_api.h",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_api.h",
+      "summary": "C API header for GNM, exposing pure-C function wrappers around the C++ GNMNetwork and GNMGenericNetwork classes for network operations like path finding, feature connection, rule management, and block state control.",
+      "tags": ["header", "c-api", "public-interface"],
+      "complexity": "simple",
+      "language": "c"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm.h",
+      "type": "file",
+      "name": "gnm.h",
+      "filePath": "src/gdal-3.13.0/gnm/gnm.h",
+      "summary": "Main public header for the GNM subsystem, declaring the core classes GNMNetwork (abstract base for all networks), GNMGenericNetwork (generic network with graph topology), GNMGenericLayer (network-aware layer wrapper), GNMRule (connection rule), and OGRGNMWrappedResultLayer (result layer for path queries). Also defines metadata constants and algorithm type enums.",
+      "tags": ["header", "public-api", "core", "class-hierarchy"],
+      "complexity": "complex",
+      "language": "c"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_priv.h",
+      "type": "file",
+      "name": "gnm_priv.h",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_priv.h",
+      "summary": "Private/internal header defining GNM constants: system layer names (_gnm_meta, _gnm_graph, _gnm_features), system field names (source, target, connector, cost, etc.), blocking state bitmask constants, rule keyword strings, and version identifiers.",
+      "tags": ["header", "private", "constants", "internal"],
+      "complexity": "simple",
+      "language": "c"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnmgraph.h",
+      "type": "file",
+      "name": "gnmgraph.h",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.h",
+      "summary": "Header for the in-memory graph class GNMGraph, which stores vertices and edges using STL maps and provides Dijkstra shortest path, K shortest paths (Yen's algorithm), and connected components (BFS) algorithms. Defines GNMStdEdge, GNMStdVertex structs and type aliases GNMPATH, GNMGFID, etc.",
+      "tags": ["header", "graph", "data-structure", "algorithms", "dijkstra", "yen", "bfs"],
+      "complexity": "moderate",
+      "language": "c"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnmgraph.cpp",
+      "type": "file",
+      "name": "gnmgraph.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.cpp",
+      "summary": "Implementation of the GNMGraph class providing graph operations: vertex/edge add/delete, block state management, Dijkstra shortest path tree construction, K shortest paths via Yen's algorithm with edge-cost infinity assignment for path diversification, and connected components via recursive breadth-first search.",
+      "tags": ["implementation", "graph", "dijkstra", "yen", "bfs", "shortest-path", "connected-components"],
+      "complexity": "complex",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp",
+      "type": "file",
+      "name": "gnmgenericnetwork.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp",
+      "summary": "Core implementation of GNMGenericNetwork, the generic network format class. Implements feature connection/disconnection with rule validation, graph layer persistence, metadata loading/saving, block state management, path computation dispatch (Dijkstra/K-shortest/connected components), auto-connect by line endpoints, system layer creation (metadata, graph, features), and the C API bridge functions.",
+      "tags": ["implementation", "core", "network", "topology", "persistence", "c-api"],
+      "complexity": "complex",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnmlayer.cpp",
+      "type": "file",
+      "name": "gnmlayer.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnmlayer.cpp",
+      "summary": "Implementation of GNMGenericLayer, a wrapper around OGRLayer that translates between global feature IDs (GNMGFID) and per-layer FIDs, handles feature creation with automatic global ID assignment and block-state initialization, and delegates feature deletion to graph disconnection.",
+      "tags": ["implementation", "layer", "fid-mapping", "wrapper"],
+      "complexity": "moderate",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnmnetwork.cpp",
+      "type": "file",
+      "name": "gnmnetwork.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnmnetwork.cpp",
+      "summary": "Implementation of the GNMNetwork base class and its C API wrappers (GNMGetName, GNMGetVersion, GNMDisconnectAll, GNMGetFeatureByGlobalFID, GNMGetPath, GNMCastToNetwork, GNMCastToGenericNetwork). Provides default GetName/GetSpatialRef/GetFileList behavior.",
+      "tags": ["implementation", "base-class", "c-api"],
+      "complexity": "simple",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnmresultlayer.cpp",
+      "type": "file",
+      "name": "gnmresultlayer.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnmresultlayer.cpp",
+      "summary": "Implementation of OGRGNMWrappedResultLayer, the in-memory result layer returned by path queries. Creates standard GNM fields (gnm_fid, ogrlayer, path_num, ftype) and provides InsertFeature to dynamically add source-layer fields and tag features with path number and edge/vertex type.",
+      "tags": ["implementation", "result-layer", "path-query", "in-memory"],
+      "complexity": "moderate",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnmrule.cpp",
+      "type": "file",
+      "name": "gnmrule.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnmrule.cpp",
+      "summary": "Implementation of GNMRule, which parses connection rule strings like 'ALLOW CONNECTS layer1 WITH layer2 VIA layer3' or 'ALLOW CONNECTS ANY'. Validates tokens, extracts source/target/connector layer names, and provides CanConnect() to check if a given connection is permitted.",
+      "tags": ["implementation", "rules", "connection-validation", "parser"],
+      "complexity": "moderate",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_frmts/gnm_frmts.h",
+      "type": "file",
+      "name": "gnm_frmts.h",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/gnm_frmts.h",
+      "summary": "Header declaring GNM format driver registration functions: GNMRegisterAll, GNMRegisterAllInternal, RegisterGNMFile, and RegisterGNMDatabase.",
+      "tags": ["header", "format-registration", "driver"],
+      "complexity": "simple",
+      "language": "c"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_frmts/gnmregisterall.cpp",
+      "type": "file",
+      "name": "gnmregisterall.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/gnmregisterall.cpp",
+      "summary": "Registration entry point that conditionally registers the GNMFile and GNMDatabase format drivers based on compile-time flags (GNMFILE_ENABLED, GNMDB_ENABLED).",
+      "tags": ["registration", "driver", "initialization"],
+      "complexity": "simple",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h",
+      "type": "file",
+      "name": "gnmfile.h",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h",
+      "summary": "Header for GNMFileNetwork, the file-system-based GNM network implementation. Stores system layers as separate files in a directory, with metadata, graph, and features datasets each backed by individual GDALDatasets.",
+      "tags": ["header", "file-driver", "network-implementation"],
+      "complexity": "moderate",
+      "language": "c"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfiledriver.cpp",
+      "type": "file",
+      "name": "gnmfiledriver.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfiledriver.cpp",
+      "summary": "GDAL driver registration for the GNMFile format. Implements driver identify (checks for directory with _gnm_meta, _gnm_graph, _gnm_features files), open, create, and delete operations. Registers the 'GNMFile' driver with creation options for network name, description, SRS, format, and overwrite.",
+      "tags": ["driver", "file-format", "registration", "gdal-driver"],
+      "complexity": "moderate",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfilenetwork.cpp",
+      "type": "file",
+      "name": "gnmfilenetwork.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfilenetwork.cpp",
+      "summary": "Implementation of GNMFileNetwork, the file-based network storage. Manages network as a directory of Shapefiles: opens/creates metadata/graph/features datasets as separate files, handles SRS storage as .prj file, supports layer creation as new files in the network directory, and implements layer deletion/cleanup.",
+      "tags": ["implementation", "file-driver", "shapefile", "persistence"],
+      "complexity": "complex",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h",
+      "type": "file",
+      "name": "gnmdb.h",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h",
+      "summary": "Header for GNMDatabaseNetwork, the database-backed (PostgreSQL) GNM network implementation. Stores all system layers in a single database using the PostgreSQL driver.",
+      "tags": ["header", "db-driver", "postgresql", "network-implementation"],
+      "complexity": "moderate",
+      "language": "c"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbdriver.cpp",
+      "type": "file",
+      "name": "gnmdbdriver.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbdriver.cpp",
+      "summary": "GDAL driver registration for the GNMDatabase format. Implements driver identify (checks for PG:/PGB: prefix and GDAL_OF_GNM flag), open, create, and delete operations. Registers the 'GNMDatabase' driver backed by PostgreSQL.",
+      "tags": ["driver", "db-format", "postgresql", "registration", "gdal-driver"],
+      "complexity": "moderate",
+      "language": "cpp"
+    },
+    {
+      "id": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbnetwork.cpp",
+      "type": "file",
+      "name": "gnmdbnetwork.cpp",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbnetwork.cpp",
+      "summary": "Implementation of GNMDatabaseNetwork, the PostgreSQL-backed network storage. Manages network within a database schema, forms connection names with active_schema parameter, creates/deletes system layers as database tables, and loads user layers from the same database.",
+      "tags": ["implementation", "db-driver", "postgresql", "persistence"],
+      "complexity": "complex",
+      "language": "cpp"
+    },
+    {
+      "id": "class:src/gdal-3.13.0/gnm/gnm.h:GNMNetwork",
+      "type": "class",
+      "name": "GNMNetwork",
+      "filePath": "src/gdal-3.13.0/gnm/gnm.h",
+      "summary": "Abstract base class for all GNM geographic networks, inheriting from GDALDataset. Declares pure virtual methods for Create, Open, Delete, DisconnectAll, GetFeatureByGlobalFID, and GetPath with algorithm selection.",
+      "tags": ["class", "abstract", "base-class", "network", "public-api"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork",
+      "type": "class",
+      "name": "GNMGenericNetwork",
+      "filePath": "src/gdal-3.13.0/gnm/gnm.h",
+      "summary": "Generic network format class extending GNMNetwork with full topology support: feature connections, rules, block states, graph layer management, and path computation. Contains an in-memory GNMGraph, system layers (metadata, graph, features), and a feature-FID-to-layer mapping.",
+      "tags": ["class", "generic-network", "topology", "graph-management"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericLayer",
+      "type": "class",
+      "name": "GNMGenericLayer",
+      "filePath": "src/gdal-3.13.0/gnm/gnm.h",
+      "summary": "Network-aware OGRLayer wrapper that translates between global feature IDs and per-layer FIDs, automatically assigns global IDs on feature creation, and triggers graph disconnection on feature deletion.",
+      "tags": ["class", "layer", "wrapper", "fid-translation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/gdal-3.13.0/gnm/gnm.h:GNMRule",
+      "type": "class",
+      "name": "GNMRule",
+      "filePath": "src/gdal-3.13.0/gnm/gnm.h",
+      "summary": "Represents a connection rule in the network (e.g., 'ALLOW CONNECTS layer1 WITH layer2 VIA layer3'). Parses rule strings and provides CanConnect() to validate whether connections between specific layers are permitted.",
+      "tags": ["class", "rules", "connection-validation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/gdal-3.13.0/gnm/gnm.h:OGRGNMWrappedResultLayer",
+      "type": "class",
+      "name": "OGRGNMWrappedResultLayer",
+      "filePath": "src/gdal-3.13.0/gnm/gnm.h",
+      "summary": "In-memory OGRLayer wrapper for path query results. Adds standard GNM fields (gnm_fid, ogrlayer, path_num, ftype) and dynamically incorporates source feature fields via InsertFeature.",
+      "tags": ["class", "result-layer", "in-memory", "path-results"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/gdal-3.13.0/gnm/gnmgraph.h:GNMGraph",
+      "type": "class",
+      "name": "GNMGraph",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.h",
+      "summary": "In-memory graph data structure using STL maps of vertices and edges. Provides Dijkstra shortest path, K shortest paths (Yen's), connected components (BFS), and vertex/edge/block-state management.",
+      "tags": ["class", "graph", "data-structure", "algorithms"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h:GNMFileNetwork",
+      "type": "class",
+      "name": "GNMFileNetwork",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h",
+      "summary": "File-system-based GNM network implementation. Stores network as a directory of Shapefiles, with separate GDALDataset instances for metadata, graph, and features layers.",
+      "tags": ["class", "file-driver", "shapefile", "concrete-implementation"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h:GNMDatabaseNetwork",
+      "type": "class",
+      "name": "GNMDatabaseNetwork",
+      "filePath": "src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h",
+      "summary": "PostgreSQL-backed GNM network implementation. Stores all network layers in database tables within a schema, using a single GDALDataset connection.",
+      "tags": ["class", "db-driver", "postgresql", "concrete-implementation"],
+      "complexity": "complex"
+    },
+    {
+      "id": "struct:src/gdal-3.13.0/gnm/gnmgraph.h:GNMStdEdge",
+      "type": "struct",
+      "name": "GNMStdEdge",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.h",
+      "summary": "Edge data structure storing source/target vertex FIDs, bidirectionality flag, direct/inverse costs, and blocked state.",
+      "tags": ["struct", "graph", "edge"],
+      "complexity": "simple"
+    },
+    {
+      "id": "struct:src/gdal-3.13.0/gnm/gnmgraph.h:GNMStdVertex",
+      "type": "struct",
+      "name": "GNMStdVertex",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.h",
+      "summary": "Vertex data structure storing a vector of outgoing edge FIDs and a blocked state flag.",
+      "tags": ["struct", "graph", "vertex"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPath",
+      "type": "function",
+      "name": "GNMGraph::DijkstraShortestPath",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.cpp",
+      "summary": "Computes the shortest path between two vertices using Dijkstra's algorithm by building a shortest-path tree and tracing back from end to start.",
+      "tags": ["algorithm", "dijkstra", "shortest-path"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:KShortestPaths",
+      "type": "function",
+      "name": "GNMGraph::KShortestPaths",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.cpp",
+      "summary": "Implements Yen's K shortest paths algorithm, iteratively finding alternative paths by temporarily removing edges from previously found paths and re-running Dijkstra.",
+      "tags": ["algorithm", "yen", "k-shortest-paths"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:ConnectedComponents",
+      "type": "function",
+      "name": "GNMGraph::ConnectedComponents",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.cpp",
+      "summary": "Finds connected components starting from emitter vertices using recursive breadth-first search, returning all reachable vertex-edge pairs.",
+      "tags": ["algorithm", "bfs", "connected-components", "resource-distribution"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPathTree",
+      "type": "function",
+      "name": "GNMGraph::DijkstraShortestPathTree",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgraph.cpp",
+      "summary": "Builds a Dijkstra shortest-path tree from a given vertex using a priority queue (multimap), respecting blocked vertices and edges.",
+      "tags": ["algorithm", "dijkstra", "priority-queue"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectFeatures",
+      "type": "function",
+      "name": "GNMGenericNetwork::ConnectFeatures",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp",
+      "summary": "Creates a topological connection between two features via a connector feature, validating against network rules, supporting virtual connections (FID=-1), and updating both the graph layer and in-memory graph.",
+      "tags": ["topology", "connection", "rules-validation"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath",
+      "type": "function",
+      "name": "GNMGenericNetwork::GetPath",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp",
+      "summary": "Dispatches path computation to the appropriate graph algorithm (Dijkstra, K-shortest, or connected components) and fills an in-memory result layer with the path features.",
+      "tags": ["path-computation", "dispatch", "result-layer"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:LoadGraph",
+      "type": "function",
+      "name": "GNMGenericNetwork::LoadGraph",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp",
+      "summary": "Loads the in-memory graph from the persisted graph layer by iterating all graph features and adding edges with their costs, directions, and block states.",
+      "tags": ["persistence", "graph-loading"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectPointsByLines",
+      "type": "function",
+      "name": "GNMGenericNetwork::ConnectPointsByLines",
+      "filePath": "src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp",
+      "summary": "Automatically builds network topology by finding nearest point features at line endpoints within a tolerance, then connecting them via the line feature.",
+      "tags": ["auto-connect", "topology", "spatial-query"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/gnm/gnmrule.cpp:ParseRuleString",
+      "type": "function",
+      "name": "GNMRule::ParseRuleString",
+      "filePath": "src/gdal-3.13.0/gnm/gnmrule.cpp",
+      "summary": "Tokenizes and parses a rule string like 'ALLOW CONNECTS layer1 WITH layer2 VIA layer3', extracting allow/deny flag, ANY flag, and source/target/connector layer names.",
+      "tags": ["parser", "rules", "tokenization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/apps/gnmanalyse.cpp:CreateAndFillOutputDataset",
+      "type": "function",
+      "name": "CreateAndFillOutputDataset",
+      "filePath": "src/gdal-3.13.0/apps/gnmanalyse.cpp",
+      "summary": "Creates a new GDAL dataset in the specified format and copies a result layer into it, handling overwrite logic.",
+      "tags": ["output", "dataset-creation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/gdal-3.13.0/apps/gnmanalyse.cpp:ReportOnLayer",
+      "type": "function",
+      "name": "ReportOnLayer",
+      "filePath": "src/gdal-3.13.0/apps/gnmanalyse.cpp",
+      "summary": "Prints detailed information about a layer including name, geometry type, feature count, extent, SRS, fields, and dumps all features in readable format.",
+      "tags": ["reporting", "layer-info", "debug"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {"source": "file:src/gdal-3.13.0/gnm/gnm.h", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMNetwork", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm.h", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm.h", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericLayer", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm.h", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMRule", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm.h", "target": "class:src/gdal-3.13.0/gnm/gnm.h:OGRGNMWrappedResultLayer", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgraph.h", "target": "class:src/gdal-3.13.0/gnm/gnmgraph.h:GNMGraph", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgraph.h", "target": "struct:src/gdal-3.13.0/gnm/gnmgraph.h:GNMStdEdge", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgraph.h", "target": "struct:src/gdal-3.13.0/gnm/gnmgraph.h:GNMStdVertex", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgraph.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPath", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgraph.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:KShortestPaths", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgraph.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:ConnectedComponents", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgraph.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPathTree", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectFeatures", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:LoadGraph", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectPointsByLines", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmrule.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmrule.cpp:ParseRuleString", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/apps/gnmanalyse.cpp", "target": "function:src/gdal-3.13.0/apps/gnmanalyse.cpp:CreateAndFillOutputDataset", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/apps/gnmanalyse.cpp", "target": "function:src/gdal-3.13.0/apps/gnmanalyse.cpp:ReportOnLayer", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h", "target": "class:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h:GNMFileNetwork", "type": "contains"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h", "target": "class:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h:GNMDatabaseNetwork", "type": "contains"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMNetwork", "type": "inherits"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericLayer", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMNetwork", "type": "related"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm.h:OGRGNMWrappedResultLayer", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMNetwork", "type": "related"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h:GNMFileNetwork", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork", "type": "inherits"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h:GNMDatabaseNetwork", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork", "type": "inherits"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork", "target": "class:src/gdal-3.13.0/gnm/gnmgraph.h:GNMGraph", "type": "related"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMRule", "type": "related"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericLayer", "target": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork", "type": "related"},
+    {"source": "file:src/gdal-3.13.0/apps/gnmanalyse.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_api.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/apps/gnmmanage.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_api.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_api.h", "target": "file:src/gdal-3.13.0/gnm/gnm.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "target": "file:src/gdal-3.13.0/gnm/gnm.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "target": "file:src/gdal-3.13.0/gnm/gnmgraph.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp", "target": "file:src/gdal-3.13.0/gnm/gnmgraph.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmgraph.cpp", "target": "file:src/gdal-3.13.0/gnm/gnmgraph.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmlayer.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmnetwork.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmresultlayer.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnmrule.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbdriver.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbnetwork.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfiledriver.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfilenetwork.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/gnmregisterall.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_frmts/gnm_frmts.h", "type": "imports"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPath", "type": "calls"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:KShortestPaths", "type": "calls"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:ConnectedComponents", "type": "calls"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPath", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPathTree", "type": "calls"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:KShortestPaths", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPath", "type": "calls"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectFeatures", "target": "function:src/gdal-3.13.0/gnm/gnmrule.cpp:ParseRuleString", "type": "related"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectPointsByLines", "target": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectFeatures", "type": "calls"},
+    {"source": "file:src/gdal-3.13.0/apps/gnmanalyse.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath", "type": "calls"},
+    {"source": "file:src/gdal-3.13.0/apps/gnmmanage.cpp", "target": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectFeatures", "type": "calls"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm.h", "target": "file:src/gdal-3.13.0/gnm/gnmgraph.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfiledriver.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_frmts/gnm_frmts.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbdriver.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_frmts/gnm_frmts.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfilenetwork.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbnetwork.cpp", "target": "file:src/gdal-3.13.0/gnm/gnm_priv.h", "type": "imports"},
+    {"source": "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork", "target": "class:src/gdal-3.13.0/gnm/gnm.h:OGRGNMWrappedResultLayer", "type": "related"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath", "target": "class:src/gdal-3.13.0/gnm/gnm.h:OGRGNMWrappedResultLayer", "type": "related"},
+    {"source": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:KShortestPaths", "target": "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPathTree", "type": "calls"}
+  ],
+  "layers": [
+    {
+      "id": "layer:core-api",
+      "name": "Core API",
+      "description": "Public and private headers, base class implementations, the in-memory graph engine, and the generic network class that ties topology, rules, and path computation together.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/gnm/gnm.h",
+        "file:src/gdal-3.13.0/gnm/gnm_api.h",
+        "file:src/gdal-3.13.0/gnm/gnm_priv.h",
+        "file:src/gdal-3.13.0/gnm/gnmnetwork.cpp",
+        "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp",
+        "file:src/gdal-3.13.0/gnm/gnmgraph.h",
+        "file:src/gdal-3.13.0/gnm/gnmgraph.cpp",
+        "file:src/gdal-3.13.0/gnm/gnmlayer.cpp",
+        "file:src/gdal-3.13.0/gnm/gnmresultlayer.cpp",
+        "file:src/gdal-3.13.0/gnm/gnmrule.cpp",
+        "class:src/gdal-3.13.0/gnm/gnm.h:GNMNetwork",
+        "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork",
+        "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericLayer",
+        "class:src/gdal-3.13.0/gnm/gnm.h:GNMRule",
+        "class:src/gdal-3.13.0/gnm/gnm.h:OGRGNMWrappedResultLayer",
+        "class:src/gdal-3.13.0/gnm/gnmgraph.h:GNMGraph",
+        "struct:src/gdal-3.13.0/gnm/gnmgraph.h:GNMStdEdge",
+        "struct:src/gdal-3.13.0/gnm/gnmgraph.h:GNMStdVertex",
+        "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPath",
+        "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPathTree",
+        "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:KShortestPaths",
+        "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:ConnectedComponents",
+        "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectFeatures",
+        "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath",
+        "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:LoadGraph",
+        "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectPointsByLines",
+        "function:src/gdal-3.13.0/gnm/gnmrule.cpp:ParseRuleString"
+      ]
+    },
+    {
+      "id": "layer:file-storage",
+      "name": "File Storage Backend",
+      "description": "File-system-based network storage using a directory of Shapefiles. Each system layer (metadata, graph, features) is a separate GDALDataset backed by individual files.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfiledriver.cpp",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfilenetwork.cpp",
+        "class:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h:GNMFileNetwork"
+      ]
+    },
+    {
+      "id": "layer:db-storage",
+      "name": "Database Storage Backend",
+      "description": "PostgreSQL-backed network storage using a database schema. All system layers are stored as tables within a single database connection.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbdriver.cpp",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbnetwork.cpp",
+        "class:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h:GNMDatabaseNetwork"
+      ]
+    },
+    {
+      "id": "layer:cli-tools",
+      "name": "CLI Tools",
+      "description": "Command-line applications for network management (create, import, connect, auto-connect) and network analysis (shortest path, K-shortest paths, connected components).",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/apps/gnmmanage.cpp",
+        "file:src/gdal-3.13.0/apps/gnmanalyse.cpp",
+        "function:src/gdal-3.13.0/apps/gnmanalyse.cpp:CreateAndFillOutputDataset",
+        "function:src/gdal-3.13.0/apps/gnmanalyse.cpp:ReportOnLayer"
+      ]
+    },
+    {
+      "id": "layer:driver-registration",
+      "name": "Driver Registration",
+      "description": "Format driver registration entry points that conditionally register the GNMFile and GNMDatabase drivers based on compile-time flags.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/gnmregisterall.cpp",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/gnm_frmts.h"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Class Hierarchy and Core Abstractions",
+      "description": "Start with the public header gnm.h to understand the class hierarchy. GNMNetwork is the abstract base inheriting from GDALDataset. GNMGenericNetwork extends it with full topology support (graph, rules, connections). GNMGenericLayer wraps OGRLayer with global FID translation. GNMRule validates connections. OGRGNMWrappedResultLayer presents path query results.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/gnm/gnm.h",
+        "class:src/gdal-3.13.0/gnm/gnm.h:GNMNetwork",
+        "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericNetwork",
+        "class:src/gdal-3.13.0/gnm/gnm.h:GNMGenericLayer",
+        "class:src/gdal-3.13.0/gnm/gnm.h:GNMRule",
+        "class:src/gdal-3.13.0/gnm/gnm.h:OGRGNMWrappedResultLayer"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Graph Data Structure and Algorithms",
+      "description": "The in-memory graph engine (GNMGraph) stores vertices and edges in STL maps. It implements three core algorithms: Dijkstra shortest path (via a shortest-path tree with priority queue), K shortest paths using Yen's algorithm (iteratively removing edges from prior paths), and connected components via recursive BFS for resource distribution analysis.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/gnm/gnmgraph.h",
+        "file:src/gdal-3.13.0/gnm/gnmgraph.cpp",
+        "class:src/gdal-3.13.0/gnm/gnmgraph.h:GNMGraph",
+        "struct:src/gdal-3.13.0/gnm/gnmgraph.h:GNMStdEdge",
+        "struct:src/gdal-3.13.0/gnm/gnmgraph.h:GNMStdVertex",
+        "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPath",
+        "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:DijkstraShortestPathTree",
+        "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:KShortestPaths",
+        "function:src/gdal-3.13.0/gnm/gnmgraph.cpp:ConnectedComponents"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Network Topology and Path Computation",
+      "description": "GNMGenericNetwork is the heart of the subsystem. ConnectFeatures creates topological links between features with rule validation. ConnectPointsByLines auto-builds topology by spatial proximity. LoadGraph hydrates the in-memory graph from persisted data. GetPath dispatches to the appropriate graph algorithm and wraps results in OGRGNMWrappedResultLayer.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp",
+        "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectFeatures",
+        "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:ConnectPointsByLines",
+        "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:LoadGraph",
+        "function:src/gdal-3.13.0/gnm/gnmgenericnetwork.cpp:GetPath",
+        "function:src/gdal-3.13.0/gnm/gnmrule.cpp:ParseRuleString"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Storage Backends: File vs Database",
+      "description": "GNMFileNetwork stores the network as a directory of Shapefiles with separate files for metadata, graph, and features layers. GNMDatabaseNetwork stores everything as tables within a PostgreSQL schema. Both extend GNMGenericNetwork and implement Open/Create/Delete plus layer management. The driver registration (gnmregisterall.cpp) conditionally registers each based on compile flags.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfilenetwork.cpp",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfiledriver.cpp",
+        "class:src/gdal-3.13.0/gnm/gnm_frmts/file/gnmfile.h:GNMFileNetwork",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbnetwork.cpp",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdbdriver.cpp",
+        "class:src/gdal-3.13.0/gnm/gnm_frmts/db/gnmdb.h:GNMDatabaseNetwork",
+        "file:src/gdal-3.13.0/gnm/gnm_frmts/gnmregisterall.cpp"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "CLI Tools: Management and Analysis",
+      "description": "Two command-line tools expose GNM functionality. gnmmanage handles network lifecycle: create, delete, import layers, connect/disconnect features, add rules, auto-connect by tolerance, and change block states. gnmanalyse performs network analysis: Dijkstra shortest path, K shortest paths, connected components for resource distribution, and layer reporting. Both use the C API (gnm_api.h) to interact with networks.",
+      "nodeIds": [
+        "file:src/gdal-3.13.0/apps/gnmmanage.cpp",
+        "file:src/gdal-3.13.0/apps/gnmanalyse.cpp",
+        "file:src/gdal-3.13.0/gnm/gnm_api.h",
+        "function:src/gdal-3.13.0/apps/gnmanalyse.cpp:CreateAndFillOutputDataset",
+        "function:src/gdal-3.13.0/apps/gnmanalyse.cpp:ReportOnLayer"
+      ]
+    }
+  ]
+}

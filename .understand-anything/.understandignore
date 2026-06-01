@@ -1,0 +1,38 @@
+# Exclude non-GNM GDAL source subdirectories
+src/gdal-3.13.0/alg/
+src/gdal-3.13.0/autotest/
+src/gdal-3.13.0/braille/
+src/gdal-3.13.0/cmake/
+src/gdal-3.13.0/doc/
+src/gdal-3.13.0/docker/
+src/gdal-3.13.0/fuzzers/
+src/gdal-3.13.0/frmts/
+src/gdal-3.13.0/gcore/
+src/gdal-3.13.0/ogr/
+src/gdal-3.13.0/perf/
+src/gdal-3.13.0/port/
+src/gdal-3.13.0/scripts/
+src/gdal-3.13.0/swig/
+src/gdal-3.13.0/third_party/
+src/gdal-3.13.0/utilities/
+src/gdal-3.13.0/.github/
+
+# Re-include GNM tests
+!src/gdal-3.13.0/autotest/gnm/
+src/gdal-3.13.0/autotest/gnm/data/
+
+# Exclude non-GNM project files
+theme/
+code/
+pencil/
+*.rst
+*.txt
+*.md
+*.bat
+.readthedocs.yaml
+requirements.txt
+.gitignore
+.gitattributes
+.hgignore
+conf.py
+Makefile

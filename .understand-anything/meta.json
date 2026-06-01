@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "project": "gdal-gnm",
+  "description": "GDAL Geographic Network Model subsystem",
+  "generatedAt": "2026-06-01T00:00:00Z",
+  "gitCommitHash": "f84d77929c04bf52fb5a2aecb8ea7c32457c4404",
+  "stats": {
+    "nodes": 41,
+    "edges": 65,
+    "layers": 5,
+    "tourSteps": 5
+  },
+  "nodeBreakdown": {
+    "files": 20,
+    "classes": 8,
+    "structs": 2,
+    "functions": 11
+  },
+  "edgeBreakdown": {
+    "contains": 21,
+    "imports": 24,
+    "calls": 9,
+    "related": 8,
+    "inherits": 3
+  },
+  "layers": [
+    "layer:core-api",
+    "layer:file-storage",
+    "layer:db-storage",
+    "layer:cli-tools",
+    "layer:driver-registration"
+  ]
+}
