@@ -36,6 +36,7 @@ HeadFirst GDAL
     gdal3-vsi-cpl
     gdal3-tools
     gdal3-algorithms
+    gdal3-gnm
 
 Indices and tables
 ==================

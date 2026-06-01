@@ -37,6 +37,7 @@ GDAL/OGR 中文入门教程，涵盖 GDAL 2.x 到 3.13 的完整知识体系。
 | gdal3-vsi-cpl | 虚拟文件系统与 CPL 工具函数 |
 | gdal3-tools | GDAL 3.x 新工具介绍 (统一 CLI、Pipeline、编程调用) |
 | gdal3-algorithms | GDAL 算法库详解 (栅格化、矢量化、插值、视域、Warp、波段代数) |
+| gdal3-gnm | 地理网络分析 (GNM、Dijkstra、K 最短路径、连通分量) |
 
 ### OGR 矢量篇
 
